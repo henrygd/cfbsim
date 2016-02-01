@@ -1,0 +1,21 @@
+{
+  "name": "cfbsim",
+  "version": "1.0.0",
+  "description": "Simulates college football matchups using current team statistics",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "henrygd",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-live-server": "0.0.29",
+    "gulp-rename": "^1.2.2",
+    "gulp-ruby-sass": "^2.0.6",
+    "gulp-uglify": "^1.5.1",
+    "gulp-uglifycss": "^1.0.5"
+  }
+}

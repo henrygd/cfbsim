@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CFB SIM</title>
+  <link rel='icon' href='img/favicon.png'>
+  <link rel="stylesheet" media="all" href="https://code.cdn.mozilla.net/fonts/fira.css">
+  <link rel="stylesheet" media="all" href="css/normalize.css">
+  <link rel="stylesheet" media="all" href="css/scrollbar.css">
+  <link rel="stylesheet" media="all" href="css/landing.css">
+</head>
+<body class="hide-elements">
+
+<h1 class="heading">CFB SIM</h1>
+
+<div class="back-image"></div>
+
+<div id="results_container">
+  <div id="sim_bar">
+    <div class="sim-text scanlines"><div>Simulating <span class="counter">400</span> games</div></div>
+    <div id="team_one_bar" class="scanlines"></div>
+    <div id="team_two_bar" class="scanlines"></div>
+  </div>
+  <div id="sim_stats">
+    <div id="sim_winning_pct" class="sim-inner">
+      <div class="team-one"></div>
+      <div class="team-two"></div>
+    </div>
+    <div id="sim_score" class="sim-inner"></div>
+  </div>
+  <button id="close_results_btn">CLOSE</button>
+</div>
+
+<div id="sim_container">
+
+  <div class="team-panel" id="team_one_panel">
+  <div class="logo-container scanlines">
+    <img alt="team_logo" id="team_one_logo" class="logo"/>
+    <button class="random-icon random-btn" id="random_btn_team_one"></button>
+  </div>
+  
+  <div class="team-panel-cells">
+  <div class="custom-select panel-cell">
+    <div class="name-container">
+      <span class="team-name">Charlotte</span>
+    </div>
+    <ul name="" class="select-options" id="team_one_options">
+      <h4>American Athletic</h4>
+        <li>Cincinnati</li>
+        <li>Connecticut</li>
+        <li>East Carolina</li>
+        <li>Houston</li>
+        <li>Memphis</li>
+        <li>Navy</li>
+        <li>SMU</li>
+        <li>South Florida</li>
+        <li>Temple</li>
+        <li>Tulane</li>
+        <li>Tulsa</li>
+        <li>UCF</li>
+      <h4>ACC</h4>
+        <li>Boston College</li>
+        <li>Clemson</li>
+        <li>Duke</li>
+        <li>Florida State</li>
+        <li>Georgia Tech</li>
+        <li>Louisville</li>
+        <li>Miami (Florida)</li>
+        <li>North Carolina State</li>
+        <li>North Carolina</li>
+        <li>Pittsburgh</li>
+        <li>Syracuse</li>
+        <li>Virginia</li>
+        <li>Virginia Tech</li>
+        <li>Wake Forest</li>
+      <h4>Big 12</h4>
+        <li>Baylor</li>
+        <li>Iowa State</li>
+        <li>Kansas</li>
+        <li>Kansas State</li>
+        <li>Oklahoma</li>
+        <li>Oklahoma State</li>
+        <li>TCU</li>
+        <li>Texas</li>
+        <li>Texas Tech</li>
+        <li>West Virginia</li>
+      <h4>Big Ten</h4>
+        <li>Illinois</li>
+        <li>Indiana</li>
+        <li>Iowa</li>
+        <li>Maryland</li>
+        <li>Michigan</li>
+        <li>Michigan State</li>
+        <li>Minnesota</li>
+        <li>Nebraska</li>
+        <li>Northwestern</li>
+        <li>Ohio State</li>
+        <li>Penn State</li>
+        <li>Purdue</li>
+        <li>Rutgers</li>
+        <li>Wisconsin</li>
+      <h4>Conference USA</h4>
+        <li>Charlotte</li>
+        <li>Florida Atlantic</li>
+        <li>Florida International</li>
+        <li>Louisiana Tech</li>
+        <li>Marshall</li>
+        <li>Middle Tennessee</li>
+        <li>North Texas</li>
+        <li>Old Dominion</li>
+        <li>Rice</li>
+        <li>Southern Mississippi</li>
+        <li>UTSA</li>
+        <li>UTEP</li>
+        <li>Western Kentucky</li>
+      <h4>Independents</h4>
+        <li>Army</li>
+        <li>BYU</li>
+        <li>Notre Dame</li>
+        <li>Akron</li>
+      <h4>Mid-American</h4>
+        <li>Ball State</li>
+        <li>Bowling Green</li>
+        <li>Buffalo</li>
+        <li>Central Michigan</li>
+        <li>Eastern Michigan</li>
+        <li>Kent State</li>
+        <li>Massachusetts</li>
+        <li>Miami (Ohio)</li>
+        <li>Northern Illinois</li>
+        <li>Ohio</li>
+        <li>Toledo</li>
+        <li>Western Michigan</li>
+      <h4>Mountain West</h4>
+        <li>Air Force</li>
+        <li>Boise State</li>
+        <li>Colorado State</li>
+        <li>Fresno State</li>
+        <li>Hawai'i</li>
+        <li>Nevada</li>
+        <li>New Mexico</li>
+        <li>San Diego State</li>
+        <li>San Jose State</li>
+        <li>UNLV</li>
+        <li>Utah State</li>
+        <li>Wyoming</li>
+      <h4>PAC 12</h4>
+        <li>Arizona</li>
+        <li>Arizona State</li>
+        <li>California</li>
+        <li>Colorado</li>
+        <li>Oregon</li>
+        <li>Oregon State</li>
+        <li>Stanford</li>
+        <li>UCLA</li>
+        <li>USC</li>
+        <li>Utah</li>
+        <li>Washington</li>
+        <li>Washington State</li>
+      <h4>SEC</h4>
+        <li>Alabama</li>
+        <li>Arkansas</li>
+        <li>Auburn</li>
+        <li>Florida</li>
+        <li>Georgia</li>
+        <li>Kentucky</li>
+        <li>LSU</li>
+        <li>Mississippi State</li>
+        <li>Missouri</li>
+        <li>Mississippi</li>
+        <li>South Carolina</li>
+        <li>Tennessee</li>
+        <li>Texas A&M</li>
+        <li>Vanderbilt</li>
+      <h4>Sun Belt</h4>
+        <li>Appalachian State</li>
+        <li>Arkansas State</li>
+        <li>Georgia Southern</li>
+        <li>Georgia State</li>
+        <li>Idaho</li>
+        <li>Louisiana-Lafayette</li>
+        <li>Louisiana-Monroe</li>
+        <li>New Mexico State</li>
+        <li>South Alabama</li>
+        <li>Texas State</li>
+        <li>Troy</li>
+    </ul>
+  </div>
+
+    <div class="rating panel-cell overall scanlines">
+      <h3><span>0</span> Overall</h3>
+      <!-- <div class="meter"></div> -->
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Run Offense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Pass Offense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Run Defense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Pass Defense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Special Teams</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Lundgren</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Strength of Schedule</h3>
+      <div class="meter"></div>
+    </div>
+  </div>
+</div>
+
+  <div class="team-panel" id="team_two_panel">
+  <div class="logo-container scanlines">
+    <img alt="team_logo" id="team_two_logo" class="logo"/>
+    <button class="random-icon random-btn" id="random_btn_team_two"></button>
+  </div>
+  
+  <div class="team-panel-cells">
+  <div class="custom-select panel-cell">
+    <div class="name-container">
+      <span class="team-name">Charlotte</span>
+    </div>
+    <ul name="" class="select-options" id="team_two_options">
+      <h4>American Athletic</h4>
+        <li>Cincinnati</li>
+        <li>Connecticut</li>
+        <li>East Carolina</li>
+        <li>Houston</li>
+        <li>Memphis</li>
+        <li>Navy</li>
+        <li>SMU</li>
+        <li>South Florida</li>
+        <li>Temple</li>
+        <li>Tulane</li>
+        <li>Tulsa</li>
+        <li>UCF</li>
+      <h4>ACC</h4>
+        <li>Boston College</li>
+        <li>Clemson</li>
+        <li>Duke</li>
+        <li>Florida State</li>
+        <li>Georgia Tech</li>
+        <li>Louisville</li>
+        <li>Miami (Florida)</li>
+        <li>North Carolina State</li>
+        <li>North Carolina</li>
+        <li>Pittsburgh</li>
+        <li>Syracuse</li>
+        <li>Virginia</li>
+        <li>Virginia Tech</li>
+        <li>Wake Forest</li>
+      <h4>Big 12</h4>
+        <li>Baylor</li>
+        <li>Iowa State</li>
+        <li>Kansas</li>
+        <li>Kansas State</li>
+        <li>Oklahoma</li>
+        <li>Oklahoma State</li>
+        <li>TCU</li>
+        <li>Texas</li>
+        <li>Texas Tech</li>
+        <li>West Virginia</li>
+      <h4>Big Ten</h4>
+        <li>Illinois</li>
+        <li>Indiana</li>
+        <li>Iowa</li>
+        <li>Maryland</li>
+        <li>Michigan</li>
+        <li>Michigan State</li>
+        <li>Minnesota</li>
+        <li>Nebraska</li>
+        <li>Northwestern</li>
+        <li>Ohio State</li>
+        <li>Penn State</li>
+        <li>Purdue</li>
+        <li>Rutgers</li>
+        <li>Wisconsin</li>
+      <h4>Conference USA</h4>
+        <li>Charlotte</li>
+        <li>Florida Atlantic</li>
+        <li>Florida International</li>
+        <li>Louisiana Tech</li>
+        <li>Marshall</li>
+        <li>Middle Tennessee</li>
+        <li>North Texas</li>
+        <li>Old Dominion</li>
+        <li>Rice</li>
+        <li>Southern Mississippi</li>
+        <li>UTSA</li>
+        <li>UTEP</li>
+        <li>Western Kentucky</li>
+      <h4>Independents</h4>
+        <li>Army</li>
+        <li>BYU</li>
+        <li>Notre Dame</li>
+        <li>Akron</li>
+      <h4>Mid-American</h4>
+        <li>Ball State</li>
+        <li>Bowling Green</li>
+        <li>Buffalo</li>
+        <li>Central Michigan</li>
+        <li>Eastern Michigan</li>
+        <li>Kent State</li>
+        <li>Massachusetts</li>
+        <li>Miami (Ohio)</li>
+        <li>Northern Illinois</li>
+        <li>Ohio</li>
+        <li>Toledo</li>
+        <li>Western Michigan</li>
+      <h4>Mountain West</h4>
+        <li>Air Force</li>
+        <li>Boise State</li>
+        <li>Colorado State</li>
+        <li>Fresno State</li>
+        <li>Hawai'i</li>
+        <li>Nevada</li>
+        <li>New Mexico</li>
+        <li>San Diego State</li>
+        <li>San Jose State</li>
+        <li>UNLV</li>
+        <li>Utah State</li>
+        <li>Wyoming</li>
+      <h4>PAC 12</h4>
+        <li>Arizona</li>
+        <li>Arizona State</li>
+        <li>California</li>
+        <li>Colorado</li>
+        <li>Oregon</li>
+        <li>Oregon State</li>
+        <li>Stanford</li>
+        <li>UCLA</li>
+        <li>USC</li>
+        <li>Utah</li>
+        <li>Washington</li>
+        <li>Washington State</li>
+      <h4>SEC</h4>
+        <li>Alabama</li>
+        <li>Arkansas</li>
+        <li>Auburn</li>
+        <li>Florida</li>
+        <li>Georgia</li>
+        <li>Kentucky</li>
+        <li>LSU</li>
+        <li>Mississippi State</li>
+        <li>Missouri</li>
+        <li>Mississippi</li>
+        <li>South Carolina</li>
+        <li>Tennessee</li>
+        <li>Texas A&M</li>
+        <li>Vanderbilt</li>
+      <h4>Sun Belt</h4>
+        <li>Appalachian State</li>
+        <li>Arkansas State</li>
+        <li>Georgia Southern</li>
+        <li>Georgia State</li>
+        <li>Idaho</li>
+        <li>Louisiana-Lafayette</li>
+        <li>Louisiana-Monroe</li>
+        <li>New Mexico State</li>
+        <li>South Alabama</li>
+        <li>Texas State</li>
+        <li>Troy</li>
+    </ul>
+  </div>
+
+    <div class="rating panel-cell overall scanlines">
+      <h3><span>0</span> Overall</h3>
+      <!-- <div class="meter"></div> -->
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Run Offense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Pass Offense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Run Defense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Pass Defense</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Special Teams</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Lundgren</h3>
+      <div class="meter"></div>
+    </div>
+    <div class="rating panel-cell">
+      <h3><span>0</span> Strength of Schedule</h3>
+      <div class="meter"></div>
+    </div>
+  </div>
+</div>
+
+  <div class="team-matchup"><h2></h2><span>vs</span><h2></h2></div>
+<!--   <div id="sim-results">
+    <div class="result-header">Simulating 400 games</div>
+    <div class="result-body"></div>
+  </div> -->
+  <button class="btn-sim helmet-icon">SIMULATE MATCHUP</button>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<!-- <script src="build/js/scripts.js"></script> -->
+<script src="js/color-thief.js"></script>
+<script src="js/jquery.counterup.js"></script>
+<script src="js/perfect-scrollbar.min.js"></script>
+<script src="js/teamPanel.js"></script>
+
+<script>
+TeamRatings = {
+  'Cincinnati': [33, 73, 72, 58, 47, 74, 29, 80, 30],
+  'Connecticut': [55, 53, 51, 64, 78, 75, 51, 78, 53],
+  'East Carolina': [53, 62, 65, 69, 51, 84, 35, 80, 51],
+  'Houston': [81, 76, 68, 76, 56, 79, 54, 72, 82],
+  'Memphis': [76, 65, 84, 80, 44, 90, 39, 78, 76],
+  'Navy': [80, 89, 58, 71, 49, 75, 99, 79, 80],
+  'SMU': [37, 62, 59, 51, 37, 61, 39, 82, 35],
+  'South Florida': [70, 83, 65, 73, 70, 79, 51, 79, 69],
+  'Temple': [83, 67, 62, 78, 82, 87, 47, 87, 82],
+  'Tulane': [38, 55, 50, 66, 43, 56, 44, 78, 36],
+  'Tulsa': [56, 61, 75, 57, 40, 68, 40, 86, 55],
+  'UCF': [27, 43, 35, 60, 32, 84, 33, 80, 25],
+  'Boston College': [41, 60, 35, 97, 81, 59, 41, 73, 38],
+  'Clemson': [97, 78, 75, 73, 80, 76, 44, 84, 98],
+  'Duke': [63, 70, 59, 82, 47, 93, 44, 79, 61],
+  'Florida State': [82, 85, 69, 72, 63, 82, 42, 82, 82],
+  'Georgia Tech': [46, 85, 47, 64, 60, 84, 53, 86, 43],
+  'Louisville': [64, 68, 57, 82, 59, 76, 36, 82, 62],
+  'Miami (Florida)': [72, 58, 67, 54, 69, 80, 39, 84, 72],
+  'North Carolina State': [58, 74, 59, 62, 53, 73, 51, 70, 57],
+  'North Carolina': [84, 89, 72, 58, 73, 83, 49, 68, 85],
+  'Pittsburgh': [72, 73, 64, 64, 55, 87, 49, 84, 72],
+  'Syracuse': [48, 70, 52, 60, 49, 81, 52, 84, 46],
+  'Virginia': [50, 66, 57, 64, 38, 71, 33, 87, 49],
+  'Virginia Tech': [59, 58, 59, 63, 64, 91, 40, 83, 58],
+  'Wake Forest': [42, 49, 48, 69, 48, 80, 38, 85, 39],
+  'Baylor': [77, 87, 89, 74, 45, 73, 34, 75, 77],
+  'Iowa State': [43, 70, 56, 61, 37, 74, 40, 84, 41],
+  'Kansas': [28, 49, 46, 52, 37, 52, 39, 85, 25],
+  'Kansas State': [53, 64, 46, 64, 37, 95, 43, 79, 52],
+  'Oklahoma': [94, 86, 91, 77, 77, 78, 52, 90, 93],
+  'Oklahoma State': [81, 58, 83, 66, 59, 82, 58, 79, 81],
+  'TCU': [83, 80, 81, 66, 55, 84, 38, 80, 83],
+  'Texas': [54, 87, 51, 67, 46, 92, 50, 92, 52],
+  'Texas Tech': [64, 88, 80, 50, 46, 76, 39, 80, 63],
+  'West Virginia': [68, 76, 56, 66, 71, 81, 46, 80, 67],
+  'Illinois': [55, 64, 54, 68, 65, 74, 50, 85, 53],
+  'Indiana': [61, 72, 73, 59, 36, 85, 45, 83, 59],
+  'Iowa': [96, 75, 61, 77, 75, 79, 65, 79, 97],
+  'Maryland': [47, 90, 32, 76, 42, 76, 31, 90, 45],
+  'Michigan': [87, 69, 64, 78, 90, 91, 38, 95, 86],
+  'Michigan State': [98, 67, 74, 77, 61, 70, 69, 94, 99],
+  'Minnesota': [59, 71, 56, 74, 67, 82, 43, 96, 56],
+  'Nebraska': [58, 74, 59, 74, 44, 86, 32, 84, 57],
+  'Northwestern': [89, 66, 40, 80, 97, 80, 57, 85, 89],
+  'Ohio State': [99, 94, 64, 85, 79, 86, 47, 94, 99],
+  'Penn State': [69, 69, 62, 72, 71, 76, 56, 95, 68],
+  'Purdue': [39, 61, 51, 58, 46, 54, 43, 87, 37],
+  'Rutgers': [47, 69, 58, 58, 44, 86, 39, 82, 45],
+  'Wisconsin': [80, 63, 55, 85, 99, 85, 47, 90, 79],
+  'Charlotte': [31, 53, 34, 61, 43, 61, 36, 73, 29],
+  'Florida Atlantic': [42, 63, 48, 68, 49, 76, 40, 83, 39],
+  'Florida International': [46, 52, 60, 59, 48, 82, 44, 71, 45],
+  'Louisiana Tech': [61, 70, 68, 76, 43, 61, 45, 72, 60],
+  'Marshall': [68, 67, 56, 66, 70, 90, 38, 70, 67],
+  'Middle Tennessee': [60, 57, 74, 71, 54, 62, 45, 75, 59],
+  'North Texas': [31, 68, 38, 53, 36, 75, 37, 77, 28],
+  'Old Dominion': [47, 70, 54, 59, 43, 67, 51, 75, 45],
+  'Rice': [46, 61, 58, 54, 28, 64, 31, 73, 45],
+  'Southern Mississippi': [65, 79, 80, 63, 55, 77, 36, 69, 64],
+  'UTSA': [39, 63, 53, 69, 47, 66, 38, 82, 36],
+  'UTEP': [47, 60, 50, 55, 36, 67, 38, 72, 46],
+  'Western Kentucky': [79, 76, 99, 69, 49, 80, 56, 83, 78],
+  'Army': [34, 70, 46, 59, 46, 71, 40, 61, 32],
+  'BYU': [77, 65, 70, 72, 74, 79, 45, 81, 76],
+  'Notre Dame': [93, 97, 76, 67, 57, 97, 45, 97, 92],
+  'Akron': [59, 63, 50, 87, 52, 72, 40, 74, 58],
+  'Ball State': [42, 66, 53, 55, 36, 78, 58, 80, 39],
+  'Bowling Green': [78, 75, 97, 71, 64, 65, 41, 87, 77],
+  'Buffalo': [50, 59, 52, 61, 54, 62, 38, 75, 49],
+  'Central Michigan': [62, 48, 72, 71, 52, 73, 42, 77, 61],
+  'Eastern Michigan': [33, 73, 55, 47, 41, 81, 33, 86, 30],
+  'Kent State': [41, 55, 38, 76, 51, 59, 34, 78, 39],
+  'Massachusetts': [44, 70, 56, 69, 49, 72, 38, 87, 42],
+  'Miami (Ohio)': [41, 56, 45, 65, 47, 71, 30, 77, 39],
+  'Northern Illinois': [69, 69, 64, 73, 63, 71, 48, 77, 68],
+  'Ohio': [64, 67, 58, 57, 57, 76, 41, 75, 64],
+  'Toledo': [83, 83, 63, 83, 57, 75, 41, 87, 82],
+  'Western Michigan': [64, 77, 78, 55, 47, 87, 43, 80, 63],
+  'Air Force': [66, 83, 58, 63, 59, 75, 49, 75, 65],
+  'Boise State': [69, 69, 65, 78, 83, 77, 48, 76, 68],
+  'Colorado State': [61, 74, 59, 58, 59, 83, 31, 77, 60],
+  'Fresno State': [40, 61, 45, 57, 47, 64, 47, 81, 38],
+  'Hawai\'i': [38, 59, 37, 64, 40, 82, 26, 80, 36],
+  'Nevada': [53, 73, 51, 58, 53, 72, 52, 74, 52],
+  'New Mexico': [61, 80, 41, 61, 48, 73, 42, 75, 61],
+  'San Diego State': [70, 71, 51, 83, 78, 89, 55, 63, 70],
+  'San Jose State': [50, 71, 63, 55, 59, 63, 46, 77, 48],
+  'UNLV': [41, 73, 55, 52, 54, 72, 53, 79, 39],
+  'Utah State': [58, 71, 56, 76, 58, 77, 41, 81, 56],
+  'Wyoming': [37, 69, 58, 56, 39, 45, 35, 81, 35],
+  'Arizona': [60, 86, 66, 64, 38, 81, 40, 81, 59],
+  'Arizona State': [62, 70, 69, 72, 39, 80, 52, 83, 61],
+  'California': [69, 74, 84, 61, 53, 71, 50, 86, 68],
+  'Colorado': [47, 59, 54, 57, 51, 72, 43, 81, 45],
+  'Oregon': [79, 96, 78, 57, 38, 77, 42, 81, 79],
+  'Oregon State': [38, 77, 41, 57, 39, 64, 39, 85, 35],
+  'Stanford': [92, 84, 78, 64, 54, 98, 49, 93, 92],
+  'UCLA': [77, 84, 65, 69, 64, 79, 36, 92, 76],
+  'USC': [77, 76, 84, 74, 51, 81, 48, 95, 76],
+  'Utah': [85, 72, 58, 83, 65, 96, 57, 93, 84],
+  'Washington': [64, 68, 61, 80, 81, 87, 52, 84, 62],
+  'Washington State': [73, 56, 83, 56, 59, 68, 43, 79, 73],
+  'Alabama': [96, 79, 60, 99, 86, 77, 48, 86, 96],
+  'Arkansas': [70, 79, 80, 77, 47, 70, 62, 86, 69],
+  'Auburn': [60, 70, 52, 64, 64, 87, 54, 85, 58],
+  'Florida': [88, 59, 63, 80, 86, 77, 51, 93, 88],
+  'Georgia': [75, 83, 55, 72, 83, 72, 50, 81, 74],
+  'Kentucky': [50, 73, 43, 62, 60, 74, 42, 79, 48],
+  'LSU': [86, 99, 58, 73, 57, 78, 43, 99, 85],
+  'Mississippi State': [71, 69, 82, 66, 58, 80, 50, 84, 70],
+  'Missouri': [54, 56, 40, 84, 69, 67, 46, 84, 52],
+  'Mississippi': [82, 82, 79, 82, 53, 71, 43, 85, 82],
+  'South Carolina': [46, 70, 54, 57, 56, 83, 54, 84, 43],
+  'Tennessee': [74, 76, 61, 67, 55, 99, 53, 85, 73],
+  'Texas A&M': [73, 71, 59, 59, 81, 90, 40, 84, 72],
+  'Vanderbilt': [49, 60, 40, 71, 62, 65, 38, 85, 47],
+  'Appalachian State': [65, 83, 69, 73, 68, 79, 40, 67, 64],
+  'Arkansas State': [59, 68, 52, 59, 61, 74, 37, 60, 59],
+  'Georgia Southern': [60, 96, 30, 65, 61, 72, 48, 61, 60],
+  'Georgia State': [45, 44, 66, 57, 48, 60, 33, 58, 44],
+  'Idaho': [38, 56, 54, 43, 39, 66, 42, 64, 37],
+  'Louisiana-Lafayette': [38, 68, 46, 57, 38, 67, 32, 59, 37],
+  'Louisiana-Monroe': [27, 51, 46, 63, 36, 61, 28, 75, 24],
+  'New Mexico State': [37, 84, 58, 50, 40, 72, 44, 81, 34],
+  'South Alabama': [43, 61, 47, 55, 50, 64, 34, 71, 42],
+  'Texas State': [33, 70, 48, 48, 31, 71, 35, 60, 31],
+  'Troy': [38, 54, 51, 63, 43, 73, 35, 63, 36],
+};
+</script>
+
+<script>
+  $(globalOnLoad(TeamPanel.onLoad));
+</script>
+
+</body>
+</html>
