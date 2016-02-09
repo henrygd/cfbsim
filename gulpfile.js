@@ -7,10 +7,17 @@ var gulp = require('gulp'),
     sass = require('gulp-sass'),
     ghPages = require('gulp-gh-pages'),
     concat = require('gulp-concat'),
-    inject = require('gulp-inject');
+    inject = require('gulp-inject'),
+    runSequence = require('run-sequence');
 
 var sassFiles = ['css/**/*.scss'];
 var jsFiles = ['js/*.js'];
+
+// GITHUB GH-PAGES DEPLOY
+gulp.task('deploy', function() {
+  return gulp.src('./build/**/*')
+    .pipe(ghPages());
+});
 
 // INJECT STATIC FILE LINKS INTO HTML (DEV)
 gulp.task('index', function () {
@@ -65,13 +72,13 @@ gulp.task('copy_to_production', function() {
     .pipe(gulp.dest('build/js/'));
   // copy HTML files / inject static files
   gulp.src('./*.html')
-  .pipe(gulp.dest('build/'));
+  .pipe(gulp.dest('./build'));
 });
 // inject
 gulp.task('inject_production', function() {
-  gulp.src('build/*.html')
-    .pipe(inject(gulp.src(['build/js/**/*.js', 'build/css/**/*.css'],{read: false}), {relative: true}))
-    .pipe(gulp.dest('build/'));
+  gulp.src('./build/*.html')
+    .pipe(inject(gulp.src(['./build/js/*.js', './build/css/*.css'],{read: false}), {relative: true}))
+    .pipe(gulp.dest('./build'));
 });
 // copy images
 gulp.task('copy_img_to_production', function() {
@@ -97,13 +104,15 @@ gulp.task('serve_production', function(){
   var server = gls.static('./build', 8080);
   server.start();
   // run css / js tasks
-  gulp.watch(sassFiles, ['css']);
-  gulp.watch(jsFiles, ['uglifyjs']);
-  // reloads the server
-  gulp.watch(['build/js/*.js', 'build/css/*.css', './index.html'], function (file) {
-    server.notify.apply(server, [file]);
-  });
+  // gulp.watch(sassFiles, ['css']);
+  // gulp.watch(jsFiles, ['uglifyjs']);
+  // // reloads the server
+  // gulp.watch(['build/js/*.js', 'build/css/*.css', './index.html'], function (file) {
+  //   server.notify.apply(server, [file]);
+  // });
 });
 
-gulp.task('test_production', ['copy_to_production', 'inject_production', 'serve_production']);
+gulp.task('test_production', function() {
+  runSequence(['copy_to_production', 'inject_production', 'serve_production']);
+});
 gulp.task('default', ['serve']);

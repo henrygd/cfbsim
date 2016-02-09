@@ -144,7 +144,7 @@ var TeamPanel = {
     var overall = $('.overall').eq(index);
     var selectBox = $('.custom-select').eq(index);
     var fullColor = 'rgb(' + teamColor + ')';
-    var overallColor = 'rgba(' + TeamPanel.getRatingColor(TeamRatings[team][0]) + ', .65)';
+    var overallColor = 'rgba(' + TeamPanel.getRatingColor(TeamRatings[team][0]) + ', .8)';
     overall.css('background-color', overallColor);
     // $('.team-panel').eq(index).find('.logo-container').css('background-color', 'rgb(' + teamColor + 
     //               ')');
