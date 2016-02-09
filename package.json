@@ -1,20 +1,32 @@
 {
   "name": "cfbsim",
   "version": "1.0.0",
-  "description": "Simulates college football matchups using current team statistics",
-  "main": "index.js",
+  "description": "Simulates college football games based on team stats.",
+  "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "henrygd",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:henrygd/cfbsim.git"
+  },
+  "keywords": [
+    "sports",
+    "football",
+    "simulation"
+  ],
+  "author": "Hank Dollman",
+  "license": "ISC",
+  "homepage": "https://henrygd.me/cfbsim",
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
+    "gulp-concat": "^2.6.0",
     "gulp-gh-pages": "^0.5.4",
+    "gulp-inject": "^3.0.0",
     "gulp-live-server": "0.0.29",
     "gulp-rename": "^1.2.2",
-    "gulp-ruby-sass": "^2.0.6",
+    "gulp-sass": "^2.1.1",
     "gulp-uglify": "^1.5.1",
     "gulp-uglifycss": "^1.0.5"
   }

@@ -146,8 +146,8 @@ var TeamPanel = {
     var fullColor = 'rgb(' + teamColor + ')';
     var overallColor = 'rgba(' + TeamPanel.getRatingColor(TeamRatings[team][0]) + ', .65)';
     overall.css('background-color', overallColor);
-    $('.team-panel').eq(index).find('.logo-container').css('background-color', 'rgb(' + teamColor + 
-                  ')');
+    // $('.team-panel').eq(index).find('.logo-container').css('background-color', 'rgb(' + teamColor + 
+    //               ')');
     selectBox.css('background-color', 'rgb(' + teamColor + ')');
     // selectBox.css('background', 'linear-gradient(rgba(' + teamColor + 
     //               ', .9), rgb(' + teamColor + '))');
