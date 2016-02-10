@@ -17,19 +17,23 @@
 <div class="back-image"></div>
 
 <div id="results_container">
-  <div id="sim_bar">
-    <div class="sim-text scanlines"><div>Simulating <span class="counter">400</span> games</div></div>
-    <div id="team_one_bar" class="scanlines"></div>
-    <div id="team_two_bar" class="scanlines"></div>
-  </div>
-  <div id="sim_stats">
-    <div id="sim_winning_pct" class="sim-inner">
-      <div class="team-one"></div>
-      <div class="team-two"></div>
+  <div>
+    <div id="sim_bar">
+      <div class="sim-text scanlines">
+        <div>Simulating <span class="counter">400</span> games</div>
+      </div>
+      <div id="team_one_bar" class="scanlines"></div>
+      <div id="team_two_bar" class="scanlines"></div>
     </div>
-    <div id="sim_score" class="sim-inner"></div>
+    <div id="sim_stats">
+      <div id="sim_winning_pct" class="sim-inner">
+        <div class="team-one"></div>
+        <div class="team-two"></div>
+      </div>
+      <div id="sim_score" class="sim-inner"></div>
+    </div>
+    <button id="close_results_btn">CLOSE</button>
   </div>
-  <button id="close_results_btn">CLOSE</button>
 </div>
 
 <div id="sim_container">
@@ -213,7 +217,7 @@
       <div class="meter"></div>
     </div>
     <div class="rating panel-cell">
-      <h3><span>0</span> Lundgren</h3>
+      <h3><span>0</span> Discipline</h3>
       <div class="meter"></div>
     </div>
     <div class="rating panel-cell">
@@ -402,7 +406,7 @@
       <div class="meter"></div>
     </div>
     <div class="rating panel-cell">
-      <h3><span>0</span> Lundgren</h3>
+      <h3><span>0</span> Discipline</h3>
       <div class="meter"></div>
     </div>
     <div class="rating panel-cell">
@@ -413,11 +417,12 @@
 </div>
 
   <div class="team-matchup"><h2></h2><span>vs</span><h2></h2></div>
-<!--   <div id="sim-results">
-    <div class="result-header">Simulating 400 games</div>
-    <div class="result-body"></div>
-  </div> -->
   <button class="btn-sim helmet-icon">SIMULATE MATCHUP</button>
+  <div class="compare-strengths">
+    <h4>Comparative Strengths</h4>
+    <div id="compare_team_one">Pass Offense vs Pass Defense</div>
+    <div id="compare_team_two">Run Offense vs Run Defense</div>
+  </div>
 
 </div>
 
@@ -426,7 +431,7 @@
 <script src="/js/color-thief.js"></script>
 <script src="/js/jquery.counterup.js"></script>
 <script src="/js/perfect-scrollbar.min.js"></script>
-<script src="/js/teamPanel.js"></script>
+<script src="/js/cfbsim.js"></script>
 <!-- endinject -->
 
 <script>
@@ -563,7 +568,7 @@ TeamRatings = {
 </script>
 
 <script>
-  $(globalOnLoad(TeamPanel.onLoad));
+  $(globalOnLoad(cfbSim.onLoad));
 </script>
 
 </body>

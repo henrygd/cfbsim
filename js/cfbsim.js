@@ -1,11 +1,11 @@
 /* global ready function checks if logos are cached, fetches them if not,
    then passes to supplied page-specific onload function */
-function globalOnLoad(onLoadFunc){
+function globalOnLoad(cb){
   // check if team logos are pre-cached in localStorage
   if ( localStorage !== null && localStorage.logo_Michigan ){
     console.log('got it');
     // go on with loading the page
-    onLoadFunc();
+    cb();
   }
   else {
     // check if localstorage can be used
@@ -14,29 +14,31 @@ function globalOnLoad(onLoadFunc){
       // show loading icon
       $('body').addClass('loading');
       // get the dang logos
-      $.ajax({
-        // script saves all compressed png logos to localstorage as base64
-        url: 'http://www.ucarecdn.com/7cb677ff-d5a6-475a-a0db-bba46bc03f5d/teamLogos.js',
-        dataType: "script",
-        success: function(){
-          // pause loading one second to assure logos can be cached properly
-          setTimeout(function(){
-            // go on with loading the page
-            $('body').removeClass('loading');
-            onLoadFunc();
-          }, 1000);
-        }
-      });
+      $.getScript('/js/teamLogoScript/teamLogos.js');
+      // $.ajax({
+      //   // script saves all compressed png logos to localstorage as base64
+      //   url: '/js/teamLogoScript/teamLogos.js',
+      //   // url: 'http://www.ucarecdn.com/7cb677ff-d5a6-475a-a0db-bba46bc03f5d/teamLogos.js',
+      //   dataType: "script",
+      //   // success: function(){
+      //   //   // pause loading one second to assure logos can be cached properly
+      //   //   setTimeout(function(){
+      //   //     // go on with loading the page
+      //   //     $('body').removeClass('loading');
+      //   //     cb();
+      //   //   }, 1000);
+      //   // }
+      // });
     }
     // if no local storage
     else {
       alert('Local storage not supported. Team logos will not be shown.');
-      onLoadFunc();
+      cb();
     }
   }
 }
 
-var TeamPanel = {
+var cfbSim = {
   // holds active teams
   curTeams: [],
   onLoad: function(){
@@ -47,58 +49,58 @@ var TeamPanel = {
       switch(e.keyCode){
         // right arrow to get next team
         case 39:
-          nextTeam = TeamPanel.curTeams[0].nextAll('li').eq(0);
+          nextTeam = cfbSim.curTeams[0].nextAll('li').eq(0);
           if (nextTeam.length > 0)
-            TeamPanel.changeTeam(nextTeam, 0);
+            cfbSim.changeTeam(nextTeam, 0);
           break;
         // left arrow to get previous team
         case 37:
-          prevTeam = TeamPanel.curTeams[0].prevAll('li').eq(0);
+          prevTeam = cfbSim.curTeams[0].prevAll('li').eq(0);
           if (prevTeam.length > 0)
-            TeamPanel.changeTeam(prevTeam, 0);
+            cfbSim.changeTeam(prevTeam, 0);
           break;
         // down arrow to get next team
         case 40:
-          nextTeam = TeamPanel.curTeams[1].nextAll('li').eq(0);
+          nextTeam = cfbSim.curTeams[1].nextAll('li').eq(0);
           if (nextTeam.length > 0)
-            TeamPanel.changeTeam(nextTeam, 1);
+            cfbSim.changeTeam(nextTeam, 1);
           break;
         // up arrow to get previous team
         case 38:
-          prevTeam = TeamPanel.curTeams[1].prevAll('li').eq(0);
+          prevTeam = cfbSim.curTeams[1].prevAll('li').eq(0);
           if (prevTeam.length > 0)
-            TeamPanel.changeTeam(prevTeam, 1);
+            cfbSim.changeTeam(prevTeam, 1);
           break;
         // enter
         case 13:
           e.preventDefault();
           if ( !$('#results_container').hasClass('show-results') )
-            TeamPanel.startSim();
+            cfbSim.startSim();
           break;
         // exit
         case 27:
-          TeamPanel.closeSim();
+          cfbSim.closeSim();
           break;
         // r for random matchup
         case 82:
-          TeamPanel.randomTeam([0, 1]);
+          cfbSim.randomTeam([0, 1]);
           break;
         default:
           break;
       }
       // if (e.keyCode == 39)
-      //   var nextTeam = TeamPanel.curTeams[0].nextAll('li').eq(0)
+      //   var nextTeam = cfbSim.curTeams[0].nextAll('li').eq(0)
       //   if (nextTeam.length > 0)
-      //     TeamPanel.changeTeam(nextTeam, 0)
+      //     cfbSim.changeTeam(nextTeam, 0)
     });
 
     // logo image load binding to get logo color / change matchup text
     $('img.logo').on('load', function(){
-      TeamPanel.imageLoad( this, $(this).getPanelIndex() );
+      cfbSim.imageLoad( this, $(this).getPanelIndex() );
     });
     // random team button binding
     $('.random-btn').on('click', function(){
-      TeamPanel.randomTeam([$(this).getPanelIndex()]);
+      cfbSim.randomTeam([$(this).getPanelIndex()]);
     });
     // show dropdown team menu binding
     $('.name-container').on('click', function(){
@@ -107,22 +109,22 @@ var TeamPanel = {
 
     // start game simulation presentation on btn click
     $('.btn-sim').on('click', function(){
-      TeamPanel.startSim();
+      cfbSim.startSim();
     });
 
     // close game results popup
     $('#close_results_btn').on('click', function(){
-      TeamPanel.closeSim();
+      cfbSim.closeSim();
     });
 
     $(window).resize(function() {
-      TeamPanel.dropDown.setHeight();
+      cfbSim.dropDown.setHeight();
     });
 
     // initialize drop down team selection menu
-    TeamPanel.dropDown.initialize();
+    cfbSim.dropDown.initialize();
     // random teams on page load
-    TeamPanel.randomTeam([0, 1]);
+    cfbSim.randomTeam([0, 1]);
     // fade in elements on page load
     $('body').removeClass('hide-elements');
   },
@@ -131,20 +133,20 @@ var TeamPanel = {
   randomTeam: function( arr ){
     // var teamOptions = $('.select-options').eq(0).find('li');
     $(arr).each(function( index ){
-      var team = TeamPanel.teamNodelist.eq( ~~(Math.random() * 128) );
-      // TeamPanel.teamOne = team;
-      TeamPanel.changeTeam( team, arr[index] );
+      var team = cfbSim.teamNodelist.eq( ~~(Math.random() * 128) );
+      // cfbSim.teamOne = team;
+      cfbSim.changeTeam( team, arr[index] );
     });
   },
 
   imageLoad: function( img, index ){
     var team = img.getAttribute('team');
-    var teamColor = localStorage['color_' + team] || TeamPanel.getLogoColor(img, team);
+    var teamColor = localStorage['color_' + team] || cfbSim.getLogoColor(img, team);
     var teamText = $('.team-matchup').find('h2').eq(index);
     var overall = $('.overall').eq(index);
     var selectBox = $('.custom-select').eq(index);
     var fullColor = 'rgb(' + teamColor + ')';
-    var overallColor = 'rgba(' + TeamPanel.getRatingColor(TeamRatings[team][0]) + ', .8)';
+    var overallColor = 'rgba(' + cfbSim.getRatingColor(TeamRatings[team][0]) + ', .8)';
     overall.css('background-color', overallColor);
     // $('.team-panel').eq(index).find('.logo-container').css('background-color', 'rgb(' + teamColor + 
     //               ')');
@@ -169,7 +171,7 @@ var TeamPanel = {
     var teamRatings = TeamRatings[team];
     meterText.each(function( index ){
       var rating = teamRatings[index];
-      var meterColor = TeamPanel.getRatingColor(rating);
+      var meterColor = cfbSim.getRatingColor(rating);
       $(meterText[index]).text(rating);
       // $(meters[index - 1]).animate({
       //   width: rating + '%',
@@ -218,15 +220,15 @@ var TeamPanel = {
     var teamName = team.text();
     var dropDown = $('.custom-select').eq(index);
     dropDown.find('.name-container span').text(teamName);
-    TeamPanel.changeLogo(teamName, index);
-    TeamPanel.adjustMeters(teamName, index);
+    cfbSim.changeLogo(teamName, index);
+    cfbSim.adjustMeters(teamName, index);
     dropDown.removeClass('select-active');
   },
 
   startSim: function(){
     // sim game and add results
-    var teamOneName = TeamPanel.curTeams[0][0].textContent;
-    var teamTwoName = TeamPanel.curTeams[1][0].textContent;
+    var teamOneName = cfbSim.curTeams[0][0].textContent;
+    var teamTwoName = cfbSim.curTeams[1][0].textContent;
     var teamOne = new Team( teamOneName, TeamRatings[teamOneName] );
     var teamTwo = new Team( teamTwoName, TeamRatings[teamTwoName] );
     var comparativeStrengths = compareStrengths(teamOne, teamTwo);
@@ -236,7 +238,7 @@ var TeamPanel = {
         'average score: ' + teamOneName + ' ' + simResult[2] + ', ' + teamTwoName + ' ' + simResult[3] + ', median score: ' + simResult[4] + '-' + simResult[5]);
     // put team logo / color on bar display
     $('#team_one_bar, #team_two_bar').each(function(index){
-      var team = TeamPanel.curTeams[index][0].textContent;
+      var team = cfbSim.curTeams[index][0].textContent;
       $(this).css({
         'background-color': 'rgba(' + localStorage['color_' + team] + ', 0.5)',
         'background-image': "url('" + 'data:image/png;base64,' + 
@@ -251,7 +253,7 @@ var TeamPanel = {
     // count to 400 games
     $('#sim_bar').find('.counter').counterUp();
     // drop down stats
-    showStats = setTimeout(function(){
+    ShowStats = setTimeout(function(){
       $('#sim_bar').find('.sim-text').css('opacity', '0');
       $('#sim_stats').animate({'height': '200px'}, 800);
     }, 2500);
@@ -259,7 +261,7 @@ var TeamPanel = {
 
   closeSim: function(){
     $('#results_container').removeClass('show-results');
-    window.clearTimeout(showStats);
+    clearTimeout(ShowStats);
     // $(this).slideUp();
     $('#sim_stats').animate({'height': '0px'}, 500);
     setTimeout(function(){
@@ -272,9 +274,9 @@ var TeamPanel = {
     initialize: function(){
       var teamOptions = $('.select-options');
       // store team menu elements
-      TeamPanel.teamNodelist = $('#team_one_options > li');
+      cfbSim.teamNodelist = $('#team_one_options > li');
       // set team select menu to match panel height
-      TeamPanel.dropDown.setHeight(teamOptions);
+      cfbSim.dropDown.setHeight(teamOptions);
 
       // initialize scrollbar
       Ps.initialize(teamOptions[0]);
@@ -283,7 +285,7 @@ var TeamPanel = {
       // team dropropdown click binding
       teamOptions.find('> li').on('click', function(){
         var el = $(this);
-        TeamPanel.changeTeam( el, el.getPanelIndex() );
+        cfbSim.changeTeam( el, el.getPanelIndex() );
       });
     },
 
@@ -348,7 +350,7 @@ function compareStrengths(teamOne, teamTwo) {
   //   passOffvsDef: [],
   //   runOffvsDef: [],
   //   specialTeams: [teamOne.spTeams - teamTwo.spTeams],
-  //   lundgren: [teamOne.lundgren - teamTwo.lundgren]
+  //   discipline: [teamOne.discipline - teamTwo.discipline]
   // };
   // for (var i = 0; i <= 1; i++) {
   //   var curTeam = teams[i];
@@ -412,12 +414,12 @@ function Team( teamName, rat ){
   this.runDef = rat[3];
   this.passDef = rat[4];
   this.spTeams = rat[5];
-  this.lundgren = rat[6];
+  this.discipline = rat[6];
   this.qualityPPG = rat[8];
   this.totalPoints = [];
   Team.prototype.driveAgainst = function( opponent ){
-    var teamMagic = (this.qualityPPG * 5 + this.lundgren) / (Math.random() * 10 + 10);
-    var oppMagic = (opponent.qualityPPG * 5 + opponent.lundgren) / (Math.random() * 10 + 10);
+    var teamMagic = (this.qualityPPG * 5 + this.discipline) / (Math.random() * 10 + 10);
+    var oppMagic = (opponent.qualityPPG * 5 + opponent.discipline) / (Math.random() * 10 + 10);
     // console log the magic for debugging
     // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
 
