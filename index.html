@@ -17,7 +17,7 @@
 <div class="back-image"></div>
 
 <div id="results_container">
-  <div>
+  <div class="results_popup">
     <div id="sim_bar">
       <div class="sim-text scanlines">
         <div>Simulating <span class="counter">400</span> games</div>
@@ -26,11 +26,18 @@
       <div id="team_two_bar" class="scanlines"></div>
     </div>
     <div id="sim_stats">
-      <div id="sim_winning_pct" class="sim-inner">
-        <div class="team-one"></div>
-        <div class="team-two"></div>
+      <div class="prediction">
+        <h2 class="winning-team"></h2>
+        <h3>Predicted Winner</h3>
       </div>
-      <div id="sim_score" class="sim-inner"></div>
+      <div>
+        <h2 class="wins"></h2>
+        <h3>Wins</h3>
+      </div>
+      <div>
+        <h2 class="score"></h2>
+        <h3>Average Score</h3>
+      </div>
     </div>
     <button id="close_results_btn">CLOSE</button>
   </div>
@@ -420,12 +427,14 @@
   <button class="btn-sim helmet-icon">SIMULATE MATCHUP</button>
 
   <div class="compare-strengths team-panel-cells">
-    <h4>Comparative Strengths</h4>
+    <h4>Biggest Strengths</h4>
     <div id="compare_team_one" class="panel-cell">
+      <div class="comp-strength-logo"></div>
       <h3><span>+0</span> Pass Offense vs Pass Defense</h3>
       <div class="meter"></div>
     </div>
     <div id="compare_team_two" class="panel-cell">
+      <div class="comp-strength-logo"></div>
       <h3>Run Offense vs Run Defense <span>+0</span></h3>
       <div class="meter"></div>
     </div>

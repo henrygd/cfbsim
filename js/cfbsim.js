@@ -1,3 +1,4 @@
+// todo fix biggest strength ordering for second team
 /* global ready function checks if logos are cached, fetches them if not,
    then passes to supplied page-specific onload function */
 function globalOnLoad(cb){
@@ -181,8 +182,8 @@ var cfbSim = {
                          '-webkit-transform': 'scale3d(.' + rating + ', 1, 1)',
                          'transform': 'scale3d(.' + rating + ', 1, 1)'});
     });
-
-    // $('.overall').eq(index).css('background-color', 'rgb(35, 182, 53)');
+    // find comparative strengths and adjust meters
+    cfbSim.compareStrengths();
   },
 
   getRatingColor: function(rating){
@@ -227,18 +228,37 @@ var cfbSim = {
 
   startSim: function(){
     // sim game and add results
-    var teamOneName = cfbSim.curTeams[0][0].textContent;
-    var teamTwoName = cfbSim.curTeams[1][0].textContent;
-    var teamOne = new Team( teamOneName, TeamRatings[teamOneName] );
-    var teamTwo = new Team( teamTwoName, TeamRatings[teamTwoName] );
-    var comparativeStrengths = compareStrengths(teamOne, teamTwo);
-    var simResult = SimGame(teamOne, teamTwo, 100);
-    $('#sim_winning_pct').text();
-    $('#sim_score').text( teamOneName + ' won ' + simResult[0] + ' games, ' + teamTwoName + ' won ' + simResult[1] + ' games.' +
-        'average score: ' + teamOneName + ' ' + simResult[2] + ', ' + teamTwoName + ' ' + simResult[3] + ', median score: ' + simResult[4] + '-' + simResult[5]);
+    var teamOneName = cfbSim.curTeams[0].text();
+    var teamTwoName = cfbSim.curTeams[1].text();
+    var teamOne = new Team( teamOneName );
+    var teamTwo = new Team( teamTwoName );
+    // var comparativeStrengths = compareStrengths(teamOne, teamTwo);
+    var result = SimGame(teamOne, teamTwo, 100);
+    var simStats = $('#sim_stats');
+    // $('#sim_winning_pct').text();
+    // var winner = simResult[0] > simResult[1] ? teamOneName : teamTwoName;
+    // var loser = result.teamOne.wins > result.teamto
+    console.log(result.teamOne.wins + ', ' + result.teamTwo.wins);
+    if (result.teamOne.wins === result.teamTwo.wins) {
+      simStats.find('.winning-team').text('Too close to call').css('color', '#333');
+      simStats.find('.wins').text('Even');
+    }
+    else {
+      var winner = (result.teamOne.wins > result.teamTwo.wins ? result.teamOne : result.teamTwo);
+      $('#team_one_bar').css('flex-basis', result.teamOne.wins + '%');
+      simStats.find('.winning-team').text(winner.teamName).css('color', 'rgb(' + localStorage['color_' + winner.teamName] + ')');
+      simStats.find('.wins').text(winner.wins + '/100');
+    }
+
+    simStats.find('.score').text(result.teamOne.totalPoints.average() + ' - ' + result.teamTwo.totalPoints.average());
+
+    // $('#sim_score').text( teamOneName + ' won ' + simResult[0] + ' games, ' + teamTwoName + ' won ' + simResult[1] + ' games.' +
+    //     'average score: ' + teamOneName + ' ' + simResult[2] + ', ' + teamTwoName + ' ' + simResult[3] + ', median score: ' + simResult[4] + '-' + simResult[5]);
+
+
     // put team logo / color on bar display
     $('#team_one_bar, #team_two_bar').each(function(index){
-      var team = cfbSim.curTeams[index][0].textContent;
+      var team = cfbSim.curTeams[index].text();
       $(this).css({
         'background-color': 'rgba(' + localStorage['color_' + team] + ', 0.5)',
         'background-image': "url('" + 'data:image/png;base64,' + 
@@ -249,13 +269,13 @@ var cfbSim = {
     $('#results_container').addClass('show-results');
     // assign win percent on bar
     // var rand = ~~(Math.random() * 100);
-    $('#team_one_bar').css('flex-basis', simResult[0] + '%');
     // count to 400 games
     $('#sim_bar').find('.counter').counterUp();
     // drop down stats
     ShowStats = setTimeout(function(){
+      var ddheight = simStats[0].scrollHeight;
       $('#sim_bar').find('.sim-text').css('opacity', '0');
-      $('#sim_stats').animate({'height': '200px'}, 800);
+      $('#sim_stats').css({'max-height': ddheight});
     }, 2500);
   },
 
@@ -263,7 +283,7 @@ var cfbSim = {
     $('#results_container').removeClass('show-results');
     clearTimeout(ShowStats);
     // $(this).slideUp();
-    $('#sim_stats').animate({'height': '0px'}, 500);
+    $('#sim_stats').css({'max-height': '0'});
     setTimeout(function(){
       $('#sim_bar').find('.sim-text').css('opacity', '1');
       $('#team_one_bar').css('flex-basis', '50%');
@@ -300,66 +320,79 @@ var cfbSim = {
   }
 };
 
-/* sim game function, team objects */
+// compare team ratings to find and display team strengths
+cfbSim.compareStrengths = (function() {
+  var elOne = $('#compare_team_one');
+  var elTwo = $('#compare_team_two');
+  var textOne = elOne.find('h3');
+  var textTwo = elTwo.find('h3');
+  var logoOne = elOne.find('.comp-strength-logo');
+  var logoTwo = elTwo.find('.comp-strength-logo');
+  var meterOne = elOne.find('.meter');
+  var meterTwo = elTwo.find('.meter');
+  var ratings = [
+    ['Run Offense', 'Run Defense'],
+    ['Pass Offense', 'Pass Defense'],
+    ['Run Defense', 'Run Offense'],
+    ['Pass Defense', 'Pass Offense'],
+    ['Special Teams', 'Special Teams'],
+    ['Discipline', 'Discipline']
+  ];
+  function getLogo(team) {
+    return 'url(data:image/png;base64,' + 
+                localStorage['logo_' + team.replace(/\W/g, '')] + ')';
+  }
+  function scale(el, num, team, rating, teamTwo, logo) {
+    logo.css('background-image', getLogo(team));
+    if (num <= 0)
+      el[1].html(' ¯\\_(ツ)_/¯');
+    else
+      el[1].html('<span>' + '+' + num + '</span> <i>' + ratings[rating][0] + '</i> vs <i style="background-image:' + getLogo(teamTwo) + '">' + ratings[rating][1] + '</i>');
+    el[2].css({'-webkit-transform': 'scale3d(.' + num + ', 1, 1)',
+            'transform': 'scale3d(.' + num + ', 1, 1)'});
 
-  // def sim_game( team_one, team_two, games=400 )
+  }
+  // return closure to use above vars / functions
+  return function() {
+    clearTimeout(window.TimeoutCompareStrengths);
 
-  //   # Simulate 200 games
-  //   games.times do
-  //     team_one_score = 0
-  //     team_two_score = 0
-  //     # Random per game stat boosts or drops
-  //     # team_one.random_chance_magic
-  //     # team_two.random_chance_magic
-  //     # Ten possesions for each team
-  //     10.times do
-  //       team_one_score += team_one.drive_against( team_two )
-  //       team_two_score += team_two.drive_against( team_one )
-  //     end
-  //     # OVERTIME
-  //     if team_one_score == team_two_score
-  //       # puts "Went to OT at #{team_one.name} #{team_one_score}, #{team_two.name} #{team_two_score}"
-  //       until team_one_score != team_two_score
-  //         team_one_score += team_one.drive_against( team_two )
-  //         team_two_score += team_two.drive_against( team_one )
-  //       end
-  //     end
-  //     team_one.total_points += team_one_score
-  //     team_two.total_points += team_two_score
-  //     team_one_score > team_two_score ? team_one.wins += 1 : team_two.wins += 1
-  //   end
+    window.TimeoutCompareStrengths = setTimeout(function() {
+      var teamOneName = cfbSim.curTeams[0].text();
+      var teamTwoName = cfbSim.curTeams[1].text();
+      var teamOne = new Team(teamOneName);
+      var teamTwo = new Team(teamTwoName);
+      // var teams = [teamOne, teamTwo];
+      var compRats = [
+        teamOne.runOff - teamTwo.runDef,
+        teamOne.runOff - teamTwo.runDef,
+        teamOne.runDef - teamTwo.runOff,
+        teamOne.passDef - teamTwo.passOff,
+        teamOne.spTeams - teamTwo.spTeams,
+        teamOne.discipline - teamTwo.discipline
+      ];
+      var teamOneStrength = [0, 0];
+      var teamTwoStrength = [0, 0];
+      console.log(compRats);
+      // loop through comparative ratings to find largest in favor
+      compRats.forEach(function(num, index) {
+        if (num > teamOneStrength[1])
+          teamOneStrength = [index, num];
+        if (num < teamTwoStrength[1])
+          teamTwoStrength = [index, num];
+      });
+      // make changes on page
+      // if (i === 0) {
+        scale([elOne, textOne, meterOne], teamOneStrength[1], teamOneName, teamOneStrength[0], teamTwoName, logoOne);
+        scale([elTwo, textTwo, meterTwo], (teamTwoStrength[1] * -1), teamTwoName, teamTwoStrength[0], teamOneName, logoTwo);
+      // }
 
-  //   # "Final score: #{team_one.name} #{team_one_score}, #{team_two.name} #{team_two_score}"
 
-  //   unless team_one.wins == team_two.wins
-  //     winning_team = team_one.wins > team_two.wins ? team_one : team_two
-  //   end
-  //   # projected_line = (team_one.margin < 0 ? team_one.margin * -1 : team_one.margin) / 200.0
-  //   margin = ((team_one.total_points - team_two.total_points) / 200.0)
-  //   # pluralize "games"
-  //   "#{team_one.name} won #{team_one.wins} games. #{team_two.name} won #{team_two.wins} games." \
-  //   "\nProjected winner: #{winning_team ? winning_team.name : 'Too close to call'}" \
-  //   "\nConfidence: #{winning_team ? (winning_team.wins / 4) : 100}%" \
-  //   "\nAverage margin of victory: #{(margin > 0 ? margin : margin * -1).round(1)} points" \
-  //   "\nO/U: #{(team_one.total_points + team_two.total_points) / 400}"
-  // end
+    }, 50);
 
-function compareStrengths(teamOne, teamTwo) {
-  // var teams = [teamOne, teamTwo];
-  // var comparisons = {
-  //   passOffvsDef: [],
-  //   runOffvsDef: [],
-  //   specialTeams: [teamOne.spTeams - teamTwo.spTeams],
-  //   discipline: [teamOne.discipline - teamTwo.discipline]
-  // };
-  // for (var i = 0; i <= 1; i++) {
-  //   var curTeam = teams[i];
-  //   var otherTeam = teams[i === 0 ? 1 : 0];
-  //   comparisons.passOffvsDef.push(curTeam.passOff - otherTeam.passDef);
-  //   console.log(comparisons);
-  // }
-}
+  };
+}());
 
+// sim game function, team objects
 function SimGame( teamOne, teamTwo, gamesNum) {
   var teamOneScore;
   var teamTwoScore;
@@ -397,16 +430,21 @@ function SimGame( teamOne, teamTwo, gamesNum) {
   // console.log(teamOne.teamName + ' : ' + teamOne.wins + ', ' + teamTwo.teamName + ' : ' + teamTwo.wins);
   // return teamOne.teamName + ' : ' + teamOne.wins + ', ' + teamTwo.teamName + ' : ' + teamTwo.wins;
   // console.log(teamOne.totalPoints);
-  return [teamOne.wins, 
-      teamTwo.wins,
-      teamOne.totalPoints.average(),
-      teamTwo.totalPoints.average(),
-      teamOne.totalPoints.median(),
-      teamTwo.totalPoints.median()
-    ];
+  // return [teamOne.wins, 
+  //     teamTwo.wins,
+  //     teamOne.totalPoints.average(),
+  //     teamTwo.totalPoints.average(),
+  //     teamOne.totalPoints.median(),
+  //     teamTwo.totalPoints.median()
+  //   ];
+  return {
+    teamOne: teamOne,
+    teamTwo: teamTwo
+  };
 }
 
-function Team( teamName, rat ){
+function Team( teamName ){
+  var rat = TeamRatings[teamName];
   this.teamName = teamName; 
   this.overall = rat[0];
   this.runOff = rat[1];
@@ -417,27 +455,27 @@ function Team( teamName, rat ){
   this.discipline = rat[6];
   this.qualityPPG = rat[8];
   this.totalPoints = [];
-  Team.prototype.driveAgainst = function( opponent ){
-    var teamMagic = (this.qualityPPG * 5 + this.discipline) / (Math.random() * 10 + 10);
-    var oppMagic = (opponent.qualityPPG * 5 + opponent.discipline) / (Math.random() * 10 + 10);
-    // console log the magic for debugging
-    // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
-
-    var teamRand = Math.random();
-    var oppRand  = Math.random();
-    var rand23 = teamRand * 2 + 1;
-    var rand26 = teamRand * 3 + 5;
-
-    if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 3.5) + oppMagic )
-      return 7;
-    else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 3.5) + oppMagic )
-      return 7;
-    else if ( (this.spTeams + teamMagic) / rand26 > oppRand * (opponent.spTeams + oppMagic) )
-      return 3;
-    else
-      return 0;
-  };
 }
+Team.prototype.driveAgainst = function( opponent ){
+  var teamMagic = (this.qualityPPG * 5 + this.discipline) / (Math.random() * 10 + 10);
+  var oppMagic = (opponent.qualityPPG * 5 + opponent.discipline) / (Math.random() * 10 + 10);
+  // console log the magic for debugging
+  // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
+
+  var teamRand = Math.random();
+  var oppRand  = Math.random();
+  var rand23 = teamRand * 2 + 1;
+  var rand26 = teamRand * 3 + 5;
+
+  if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 3.5) + oppMagic )
+    return 7;
+  else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 3.5) + oppMagic )
+    return 7;
+  else if ( (this.spTeams + teamMagic) / rand26 > oppRand * (opponent.spTeams + oppMagic) )
+    return 3;
+  else
+    return 0;
+};
 
 //////////////////  Prototypes & helpers /////////////////////
 
