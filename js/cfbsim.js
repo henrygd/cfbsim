@@ -33,7 +33,7 @@ function globalOnLoad(cb){
     }
     // if no local storage
     else {
-      alert('Local storage not supported. Team logos will not be shown.');
+      alert('To use this website, please download a browser that supports local storage (Chrome, Firefox, Safari, Opera, etc.)');
       cb();
     }
   }
@@ -233,8 +233,12 @@ var cfbSim = {
     var teamOne = new Team( teamOneName );
     var teamTwo = new Team( teamTwoName );
     // var comparativeStrengths = compareStrengths(teamOne, teamTwo);
-    var result = SimGame(teamOne, teamTwo, 100);
+    var numGames = 500;
+    var result = SimGame(teamOne, teamTwo, numGames);
     var simStats = $('#sim_stats');
+    function getColor(team) {
+      return 'rgb(' + localStorage['color_' + team] + ')';
+    }
     // $('#sim_winning_pct').text();
     // var winner = simResult[0] > simResult[1] ? teamOneName : teamTwoName;
     // var loser = result.teamOne.wins > result.teamto
@@ -245,16 +249,13 @@ var cfbSim = {
     }
     else {
       var winner = (result.teamOne.wins > result.teamTwo.wins ? result.teamOne : result.teamTwo);
-      $('#team_one_bar').css('flex-basis', result.teamOne.wins + '%');
-      simStats.find('.winning-team').text(winner.teamName).css('color', 'rgb(' + localStorage['color_' + winner.teamName] + ')');
-      simStats.find('.wins').text(winner.wins + '/100');
+      $('#team_one_bar').css('flex-basis', (result.teamOne.wins / numGames * 100) + '%');
+      simStats.find('.winning-team').text(winner.teamName).css('color', getColor(winner.teamName));
+      simStats.find('.wins').text(winner.wins + '/' + numGames);
     }
 
-    simStats.find('.score').text(result.teamOne.totalPoints.average() + ' - ' + result.teamTwo.totalPoints.average());
-
-    // $('#sim_score').text( teamOneName + ' won ' + simResult[0] + ' games, ' + teamTwoName + ' won ' + simResult[1] + ' games.' +
-    //     'average score: ' + teamOneName + ' ' + simResult[2] + ', ' + teamTwoName + ' ' + simResult[3] + ', median score: ' + simResult[4] + '-' + simResult[5]);
-
+    // simStats.find('.score').text( (result.teamOne.totalPoints / numGames) + ' - ' + (result.teamTwo.totalPoints / numGames) );
+    simStats.find('.score').html('<span style="color:' + getColor(teamOneName) + '">' + (result.teamOne.totalPoints / numGames).toFixed(1) + '</span> - ' + '<span style="color:' + getColor(teamTwoName) + '">' + (result.teamTwo.totalPoints / numGames).toFixed(1) + '</span>' );
 
     // put team logo / color on bar display
     $('#team_one_bar, #team_two_bar').each(function(index){
@@ -364,7 +365,7 @@ cfbSim.compareStrengths = (function() {
       // var teams = [teamOne, teamTwo];
       var compRats = [
         teamOne.runOff - teamTwo.runDef,
-        teamOne.runOff - teamTwo.runDef,
+        teamOne.passOff - teamTwo.passDef,
         teamOne.runDef - teamTwo.runOff,
         teamOne.passDef - teamTwo.passOff,
         teamOne.spTeams - teamTwo.spTeams,
@@ -406,7 +407,7 @@ function SimGame( teamOne, teamTwo, gamesNum) {
     teamOneScore = 0;
     teamTwoScore = 0;
     // ten possesions for each team
-    for (var possesions = 0; possesions < 13; possesions++) {
+    for (var possesions = 0; possesions < 11; possesions++) {
       teamOneScore += teamOne.driveAgainst( teamTwo );
       teamTwoScore += teamTwo.driveAgainst( teamOne );
     }
@@ -420,23 +421,13 @@ function SimGame( teamOne, teamTwo, gamesNum) {
       // console.log('overtime done at ' + teamOneScore + '-' + teamTwoScore);
     }
     // add to respective team's win number
-    teamOne.totalPoints.push(teamOneScore);
-    teamTwo.totalPoints.push(teamTwoScore);
+    teamOne.totalPoints += teamOneScore;
+    teamTwo.totalPoints += teamTwoScore;
     if (teamOneScore > teamTwoScore)
       teamOne.wins += 1;
     else
       teamTwo.wins += 1;
   }
-  // console.log(teamOne.teamName + ' : ' + teamOne.wins + ', ' + teamTwo.teamName + ' : ' + teamTwo.wins);
-  // return teamOne.teamName + ' : ' + teamOne.wins + ', ' + teamTwo.teamName + ' : ' + teamTwo.wins;
-  // console.log(teamOne.totalPoints);
-  // return [teamOne.wins, 
-  //     teamTwo.wins,
-  //     teamOne.totalPoints.average(),
-  //     teamTwo.totalPoints.average(),
-  //     teamOne.totalPoints.median(),
-  //     teamTwo.totalPoints.median()
-  //   ];
   return {
     teamOne: teamOne,
     teamTwo: teamTwo
@@ -454,11 +445,11 @@ function Team( teamName ){
   this.spTeams = rat[5];
   this.discipline = rat[6];
   this.qualityPPG = rat[8];
-  this.totalPoints = [];
+  this.totalPoints = 0;
 }
 Team.prototype.driveAgainst = function( opponent ){
-  var teamMagic = (this.qualityPPG * 5 + this.discipline) / (Math.random() * 10 + 10);
-  var oppMagic = (opponent.qualityPPG * 5 + opponent.discipline) / (Math.random() * 10 + 10);
+  var teamMagic = (this.qualityPPG * 8 + this.discipline) / (Math.random() * 12 + 10);
+  var oppMagic = (opponent.qualityPPG * 8 + opponent.discipline) / (Math.random() * 12 + 10);
   // console log the magic for debugging
   // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
 
@@ -467,9 +458,9 @@ Team.prototype.driveAgainst = function( opponent ){
   var rand23 = teamRand * 2 + 1;
   var rand26 = teamRand * 3 + 5;
 
-  if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 3.5) + oppMagic )
+  if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 2.5) + oppMagic )
     return 7;
-  else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 3.5) + oppMagic )
+  else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 2.5) + oppMagic )
     return 7;
   else if ( (this.spTeams + teamMagic) / rand26 > oppRand * (opponent.spTeams + oppMagic) )
     return 3;
@@ -486,24 +477,24 @@ $.fn.extend ({
   }
 });
 // returns average number from array of numbers
-Array.prototype.average = function (){
-  var total = 0;
-  this.forEach(function (num) {
-    total += num;
-  });
-  return total / this.length;
-};
+// Array.prototype.average = function (){
+//   var total = 0;
+//   this.forEach(function (num) {
+//     total += num;
+//   });
+//   return total / this.length;
+// };
 // returns median number from long array of numbers
-Array.prototype.median = function (){
-  var middle = Math.round(this.length / 2);
-  // sort in order
-  this.sort(function(a, b){return a-b;});
-  // check if even length
-  if (this.length % 2 === 0)
-    // if so, return average of middle two
-    return (this[middle] + this[middle - 1]) / 2;
-  // if odd length
-  else
-    // return middle num
-    return this[middle - 1];
-};
+// Array.prototype.median = function (){
+//   var middle = Math.round(this.length / 2);
+//   // sort in order
+//   this.sort(function(a, b){return a-b;});
+//   // check if even length
+//   if (this.length % 2 === 0)
+//     // if so, return average of middle two
+//     return (this[middle] + this[middle - 1]) / 2;
+//   // if odd length
+//   else
+//     // return middle num
+//     return this[middle - 1];
+// };

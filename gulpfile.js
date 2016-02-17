@@ -1,14 +1,16 @@
 var gulp = require('gulp'),
     uglifyJs = require('gulp-uglify'),
-    uglifyCss = require('gulp-uglifycss'),
     rename = require('gulp-rename'),
-    autoprefixer = require('gulp-autoprefixer'),
     gls = require('gulp-live-server'),
     sass = require('gulp-sass'),
     ghPages = require('gulp-gh-pages'),
     concat = require('gulp-concat'),
     inject = require('gulp-inject'),
-    runSequence = require('run-sequence');
+    runSequence = require('run-sequence'),
+    postcss = require('gulp-postcss'),
+    autoprefixer = require('autoprefixer'),
+    mqpacker = require('css-mqpacker'),
+    csswring = require('csswring');
 
 var sassFiles = ['css/**/*.scss'];
 var jsFiles = ['js/*.js'];
@@ -41,18 +43,17 @@ gulp.task('uglifyjs', function() {
 // STYLE TASKS
 // prefixes / uglifies css
 gulp.task('css', function(){
+  var processors = [
+    autoprefixer({browsers: ['last 2 versions']}),
+    mqpacker,
+    csswring
+  ];
   gulp.src(sassFiles)
+    // convert sass to css
     .pipe(sass().on('error', sass.logError))
-    // minify
-    .pipe(uglifyCss())
-    .on('error', console.error.bind(console))
-    // autoprefix
-    .pipe(autoprefixer({
-      browsers: ['last 2 versions'],
-      cascade: false
-    }))
-    // rename to .min
-    // .pipe(rename(function(path) { path.basename += '.min'; }))
+    // minify / prefix
+    .pipe(postcss(processors))
+    // save
     .pipe(gulp.dest('css/'));
 });
 
