@@ -24,7 +24,7 @@ gulp.task('deploy', function() {
 // INJECT STATIC FILE LINKS INTO HTML (DEV)
 gulp.task('index', function () {
   var target = gulp.src('./index.html');
-  var sources = gulp.src(['js/**/*.js', 'css/**/*.css'], {read: false});
+  var sources = gulp.src(['js/*.js', 'css/**/*.css'], {read: false});
   return target.pipe(inject(sources))
     .pipe(gulp.dest('./'))
     .pipe(gulp.dest('build/'));

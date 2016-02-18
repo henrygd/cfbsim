@@ -199,27 +199,48 @@ end
 ############## SACKS ##############
 sack_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/sacks.html" ) )
 sack_teams = sack_page.css('.team-name > a')
-sack_yards = sack_page.css('table.leaders td:nth-child(5)')
+sacks = sack_page.css('table.leaders td:nth-child(4)')
+sack_yds = sack_page.css('table.leaders td:nth-child(5)')
+sacks_pg = sack_page.css('table.leaders td:nth-child(6)')
 # Add team sack yards to hash
 sack_teams.each_with_index do |team, x| 
   # TEAM_HASH[team.text] ||= {}
-  TEAM_HASH[team.text::to_sym][:sack_yards] = sack_yards[x].text.to_f
+  TEAM_HASH[team.text::to_sym][:sacks] = sacks[x].text.to_f
+  TEAM_HASH[team.text::to_sym][:sack_yds] = sack_yds[x].text.to_f
+  TEAM_HASH[team.text::to_sym][:sacks_pg] = sacks_pg[x].text.to_f
+end
+
+############## SACKS ALLOWED ##############
+sacks_allowed_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/sacks_allowed.html" ) )
+sacks_allowed_teams = sacks_allowed_page.css('.team-name > a')
+sack_yds_allowed = sacks_allowed_page.css('table.leaders td:nth-child(5)')
+sacks_allowed = sacks_allowed_page.css('table.leaders td:nth-child(4)')
+sacks_allowed_pg = sack_page.css('table.leaders td:nth-child(6)')
+# Add team sack yards to hash
+sacks_allowed_teams.each_with_index do |team, x| 
+  # TEAM_HASH[team.text] ||= {}
+  TEAM_HASH[team.text::to_sym][:sack_yds_allowed] = sack_yds_allowed[x].text.to_f
+  TEAM_HASH[team.text::to_sym][:sacks_allowed] = sacks_allowed[x].text.to_f
+  TEAM_HASH[team.text::to_sym][:sacks_allowed_pg] = sacks_allowed_pg[x].text.to_f
 end
 
 # ############## RUN OFFENSE ##############
 Run_offense_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/run_offense.html" ) )
 Run_offense_teams = Run_offense_page.css('.team-name > a')
-Run_offense_ypa = Run_offense_page.css('table.leaders td:nth-child(6)')
+Run_offense_yards = Run_offense_page.css('table.leaders td:nth-child(5)')
+Run_offense_atts = Run_offense_page.css('table.leaders td:nth-child(4)')
+
 
 # Run_offense_teams.each { |t| TEAM_HASH[t.text] ||= {} }
 
-def calculate_run_offense index
-  return Run_offense_ypa[index].text.to_f
+def calculate_run_offense( arr )
+  return (Run_offense_yards[arr[0]].text.to_f + TEAM_HASH[arr[1]::to_sym][:sack_yds_allowed]) / 
+         (Run_offense_atts[arr[0]].text.to_f - TEAM_HASH[arr[1]::to_sym][:sacks_allowed])
 end
 
 # top_run_offense = calculate_run_offense( 0 ) * 1.01
 Run_offense_teams.each_with_index do |team, x|
-  run_offense = calculate_run_offense( x )
+  run_offense = calculate_run_offense( [x, team.text] )
   TEAM_HASH[team.text::to_sym][:run_offense] = run_offense
 end
 
@@ -234,17 +255,18 @@ Pass_offense_ypg = Pass_offense_page.css('table.leaders td:nth-child(13)')
 
 # Pass_offense_teams.each { |t| TEAM_HASH[t.text] ||= {} }
 
-def calculate_pass_offense index
-  return Pass_offense_ypa[index].text.to_f * 2.0 + 
-         Pass_offense_comp_percent[index].text.to_f / 4.0 + 
-         ( ( Pass_offense_tds[index].text.to_f - Pass_offense_ints[index].text.to_f) / 2.0 ) +
-         ( Pass_offense_ypg[index].text.to_f / 30.0 )
+def calculate_pass_offense( arr )
+  return ( Pass_offense_ypa[arr[0]].text.to_f * 2.0 ) -
+         ( TEAM_HASH[arr[1]::to_sym][:sacks_allowed_pg] ) +
+         ( Pass_offense_comp_percent[arr[0]].text.to_f / 4.0 ) + 
+         ( ( Pass_offense_tds[arr[0]].text.to_f - Pass_offense_ints[arr[0]].text.to_f) / 2.0 ) +
+         ( Pass_offense_ypg[arr[0]].text.to_f / 30.0 )
 end
 
 # top_pass_offense = calculate_pass_offense( 0 ) * 1.01
 
 Pass_offense_teams.each_with_index do |team, x|
-  pass_offense = calculate_pass_offense( x )
+  pass_offense = calculate_pass_offense( [x, team.text] )
   TEAM_HASH[team.text::to_sym][:pass_offense] = pass_offense
 end
 
@@ -257,16 +279,14 @@ Run_defense_atts = Run_defense_page.css('table.leaders td:nth-child(4)')
 # Run_defense_teams.each { |t| TEAM_HASH[t.text] ||= {} }
 
 def calculate_run_defense( arr )
-  return ( Run_defense_yards[arr[0]].text.to_f + 
-         TEAM_HASH[arr[1]][:sack_yards] ) / 
-         Run_defense_atts[arr[0]].text.to_f
+  return (Run_defense_yards[arr[0]].text.to_f + TEAM_HASH[arr[1]::to_sym][:sack_yds]) / 
+         (Run_defense_atts[arr[0]].text.to_f - TEAM_HASH[arr[1]::to_sym][:sacks])
 end
 
 # top_run_defense = calculate_run_defense( [0, run_defense_teams[0].text] ) * 0.99
 Run_defense_teams.each_with_index do |team, x|
-  team = team.text::to_sym
-  run_defense = calculate_run_defense( [x, team] )
-  TEAM_HASH[team][:run_defense] = run_defense
+  run_defense = calculate_run_defense( [x, team.text] )
+  TEAM_HASH[team.text::to_sym][:run_defense] = run_defense
 end
 
 # ############## PASS DEFENSE ##############
@@ -280,17 +300,18 @@ Pass_defense_ypg = Pass_defense_page.css('table.leaders td:nth-child(13)')
 
 # Pass_defense_teams.each { |t| TEAM_HASH[t.text] ||= {} }
 
-def calculate_pass_defense index
-  return Pass_defense_ypa[index].text.to_f * 2.0 + 
-         Pass_defense_comp_percent[index].text.to_f / 4.0 + 
-         ( Pass_defense_tds[index].text.to_f - Pass_defense_ints[index].text.to_f ) +
-         ( Pass_defense_ypg[index].text.to_f / 30.0 )
+def calculate_pass_defense( arr )
+  return ( Pass_defense_ypa[arr[0]].text.to_f * 2.0 ) -
+         ( TEAM_HASH[arr[1]::to_sym][:sacks_pg] ) +
+         ( Pass_defense_comp_percent[arr[0]].text.to_f / 4.0 ) + 
+         ( Pass_defense_tds[arr[0]].text.to_f - Pass_defense_ints[arr[0]].text.to_f ) +
+         ( Pass_defense_ypg[arr[0]].text.to_f / 30.0 )
 end
 
 # top_pass_defense = calculate_pass_defense( 0 ) * 0.99
 
 Pass_defense_teams.each_with_index do |team, x|
-  pass_defense = calculate_pass_defense( x )
+  pass_defense = calculate_pass_defense( [x, team.text] )
   TEAM_HASH[team.text::to_sym][:pass_defense] = pass_defense
 end
 

@@ -2,41 +2,42 @@
 /* global ready function checks if logos are cached, fetches them if not,
    then passes to supplied page-specific onload function */
 function globalOnLoad(cb){
-  // check if team logos are pre-cached in localStorage
-  if ( localStorage !== null && localStorage.logo_Michigan ){
-    console.log('got it');
-    // go on with loading the page
-    cb();
-  }
-  else {
-    // check if localstorage can be used
-    if ( localStorage !== null ){
-      // $.getScript( 'http://www.ucarecdn.com/2eccf503-4ec6-41c2-8136-87408ac30079/TeamLogos.js' );
-      // show loading icon
-      $('body').addClass('loading');
-      // get the dang logos
-      $.getScript('/js/teamLogoScript/teamLogos.js');
-      // $.ajax({
-      //   // script saves all compressed png logos to localstorage as base64
-      //   url: '/js/teamLogoScript/teamLogos.js',
-      //   // url: 'http://www.ucarecdn.com/7cb677ff-d5a6-475a-a0db-bba46bc03f5d/teamLogos.js',
-      //   dataType: "script",
-      //   // success: function(){
-      //   //   // pause loading one second to assure logos can be cached properly
-      //   //   setTimeout(function(){
-      //   //     // go on with loading the page
-      //   //     $('body').removeClass('loading');
-      //   //     cb();
-      //   //   }, 1000);
-      //   // }
-      // });
-    }
-    // if no local storage
-    else {
-      alert('To use this website, please download a browser that supports local storage (Chrome, Firefox, Safari, Opera, etc.)');
-      cb();
-    }
-  }
+  // show loading icon
+  $('body').addClass('loading');
+  function clear() {$('body').removeClass('loading');}
+  // get team rankings
+  $.getScript('/js/teamRatings/teamratings.js')
+    .fail(function() {
+      clear();
+      alert('Error: Could not fetch team rankings. Please try again later.');
+    })
+    .done(function() {
+      // check if team logos are pre-cached in localStorage
+      if ( localStorage !== null && localStorage.logo_Michigan ){
+        // go on with loading the page
+        setTimeout(function() {
+          clear();
+          cb();
+        }, 300);
+      }
+      else {
+        // check if localstorage can be used
+        if ( localStorage !== null ){
+          // get logos
+          $.getScript('/js/teamLogoScript/teamLogos.js').done(function() {
+            setTimeout(function() {
+              clear();
+              cb();
+            }, 1000);
+          });
+        }
+        // if no local storage alert error
+        else {
+          clear();
+          alert('To use this website, please download a browser that supports local storage (Chrome, Opera, Safari, Firefox, etc.)');
+        }
+      }
+    });
 }
 
 var cfbSim = {
@@ -132,7 +133,6 @@ var cfbSim = {
 
   // set random teams on page load
   randomTeam: function( arr ){
-    // var teamOptions = $('.select-options').eq(0).find('li');
     $(arr).each(function( index ){
       var team = cfbSim.teamNodelist.eq( ~~(Math.random() * 128) );
       // cfbSim.teamOne = team;
@@ -177,7 +177,8 @@ var cfbSim = {
       // $(meters[index - 1]).animate({
       //   width: rating + '%',
       // }, {duration: 700, queue: false}).css('background-color', meterColor);
-      rating = rating < 10 ? '0' + rating : rating;
+      if (rating < 10 )
+        rating = '0' + rating;
       $(meters[index -1]).css({'background-color': 'rgb(' + meterColor + ')',
                          '-webkit-transform': 'scale3d(.' + rating + ', 1, 1)',
                          'transform': 'scale3d(.' + rating + ', 1, 1)'});
@@ -227,6 +228,18 @@ var cfbSim = {
   },
 
   startSim: function(){
+    // function to display count of games being simulated
+    var counter = (function() {
+      var count = 0;
+      var el = $('#sim_bar').find('.counter');
+      return function() {
+        if (count < 500) {
+          count += 10;
+          el.text(count);
+          setTimeout(counter, 32);
+        }
+      };
+    })();
     // sim game and add results
     var teamOneName = cfbSim.curTeams[0].text();
     var teamTwoName = cfbSim.curTeams[1].text();
@@ -242,7 +255,7 @@ var cfbSim = {
     // $('#sim_winning_pct').text();
     // var winner = simResult[0] > simResult[1] ? teamOneName : teamTwoName;
     // var loser = result.teamOne.wins > result.teamto
-    console.log(result.teamOne.wins + ', ' + result.teamTwo.wins);
+    // console.log(result.teamOne.wins + ', ' + result.teamTwo.wins);
     if (result.teamOne.wins === result.teamTwo.wins) {
       simStats.find('.winning-team').text('Too close to call').css('color', '#333');
       simStats.find('.wins').text('Even');
@@ -268,11 +281,9 @@ var cfbSim = {
     });
     // fade in bar
     $('#results_container').addClass('show-results');
-    // assign win percent on bar
-    // var rand = ~~(Math.random() * 100);
-    // count to 400 games
-    $('#sim_bar').find('.counter').counterUp();
-    // drop down stats
+    // show games counter
+    counter();
+    // drop down results / stats
     ShowStats = setTimeout(function(){
       var ddheight = simStats[0].scrollHeight;
       $('#sim_bar').find('.sim-text').css('opacity', '0');
@@ -325,12 +336,14 @@ var cfbSim = {
 cfbSim.compareStrengths = (function() {
   var elOne = $('#compare_team_one');
   var elTwo = $('#compare_team_two');
-  var textOne = elOne.find('h3');
-  var textTwo = elTwo.find('h3');
-  var logoOne = elOne.find('.comp-strength-logo');
-  var logoTwo = elTwo.find('.comp-strength-logo');
-  var meterOne = elOne.find('.meter');
-  var meterTwo = elTwo.find('.meter');
+  // var textOne = elOne.find('h3');
+  // var textTwo = elTwo.find('h3');
+  // var logoOne = elOne.find('.comp-strength-logo');
+  // var logoTwo = elTwo.find('.comp-strength-logo');
+  // var meterOne = elOne.find('.meter');
+  // var meterTwo = elTwo.find('.meter');
+  var elBundleOne = [elOne, elOne.find('h3'), elOne.find('.meter'), elOne.find('.comp-strength-logo')];
+  var elBundleTwo = [elTwo, elTwo.find('h3'), elTwo.find('.meter'), elTwo.find('.comp-strength-logo')];
   var ratings = [
     ['Run Offense', 'Run Defense'],
     ['Pass Offense', 'Pass Defense'],
@@ -343,13 +356,28 @@ cfbSim.compareStrengths = (function() {
     return 'url(data:image/png;base64,' + 
                 localStorage['logo_' + team.replace(/\W/g, '')] + ')';
   }
-  function scale(el, num, team, rating, teamTwo, logo) {
-    logo.css('background-image', getLogo(team));
+  function scale(position, num, team, rating, teamTwo) {
+    var el, ratingOne, ratingTwo;
+    if (position === 1) {
+      ratingOne = ratings[rating][0];
+      ratingTwo = ratings[rating][1];
+      els = elBundleOne;
+    }
+    else {
+      ratingOne = ratings[rating][1];
+      ratingTwo = ratings[rating][0];
+      els = elBundleTwo;
+    }
+    els[3].css('background-image', getLogo(team));
     if (num <= 0)
-      el[1].html(' ¯\\_(ツ)_/¯');
-    else
-      el[1].html('<span>' + '+' + num + '</span> <i>' + ratings[rating][0] + '</i> vs <i style="background-image:' + getLogo(teamTwo) + '">' + ratings[rating][1] + '</i>');
-    el[2].css({'-webkit-transform': 'scale3d(.' + num + ', 1, 1)',
+      els[1].html(' ¯\\_(ツ)_/¯');
+    else {
+      els[1].html('<span>' + '+' + num + '</span> <i>' + ratingOne + '</i> vs <i style="background-image:' + getLogo(teamTwo) + '">' + ratingTwo + '</i>');
+    }
+    num = num < 50 ? num *= 2 : 99;
+    if (num < 10)
+      num = '0' + num;
+    els[2].css({'-webkit-transform': 'scale3d(.' + num + ', 1, 1)',
             'transform': 'scale3d(.' + num + ', 1, 1)'});
 
   }
@@ -373,7 +401,6 @@ cfbSim.compareStrengths = (function() {
       ];
       var teamOneStrength = [0, 0];
       var teamTwoStrength = [0, 0];
-      console.log(compRats);
       // loop through comparative ratings to find largest in favor
       compRats.forEach(function(num, index) {
         if (num > teamOneStrength[1])
@@ -383,8 +410,8 @@ cfbSim.compareStrengths = (function() {
       });
       // make changes on page
       // if (i === 0) {
-        scale([elOne, textOne, meterOne], teamOneStrength[1], teamOneName, teamOneStrength[0], teamTwoName, logoOne);
-        scale([elTwo, textTwo, meterTwo], (teamTwoStrength[1] * -1), teamTwoName, teamTwoStrength[0], teamOneName, logoTwo);
+        scale(1, teamOneStrength[1], teamOneName, teamOneStrength[0], teamTwoName);
+        scale(2, (teamTwoStrength[1] * -1), teamTwoName, teamTwoStrength[0], teamOneName);
       // }
 
 
@@ -458,9 +485,9 @@ Team.prototype.driveAgainst = function( opponent ){
   var rand23 = teamRand * 2 + 1;
   var rand26 = teamRand * 3 + 5;
 
-  if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 2.5) + oppMagic )
+  if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 2.4) + oppMagic )
     return 7;
-  else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 2.5) + oppMagic )
+  else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 2.4) + oppMagic )
     return 7;
   else if ( (this.spTeams + teamMagic) / rand26 > oppRand * (opponent.spTeams + oppMagic) )
     return 3;
