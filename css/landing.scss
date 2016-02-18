@@ -25,11 +25,51 @@ body {
   overflow-x: hidden;
   background-color: #333;
   font-size: 15px;
+  // max-width: 100vw;
 }
 
 @media all and (min-width: 1800px) {
   body {
     font-size: 1.2em;
+  }
+}
+
+@media all and (orientation: portrait) {
+  .back-image::before {
+    will-change: transform;
+  }
+  .heading {
+    display: none;
+  }
+  #sim_container {
+    padding: 5em 0 1em;
+    height: auto;
+    > * {
+      position: relative!important;
+      max-width: 96%;
+      width: 100%;
+      left: initial;
+      right: initial!important;
+      top: initial;
+      bottom: initial;
+    }
+  }
+  .btn-sim {
+    width: auto!important;
+    margin: 1em 0;
+  }
+  .compare-strengths {
+    margin: 6em 0 0;
+    order: 3;
+  }
+  .team-panel {
+    order: 2;
+    height: 45em;
+    width: 25em;
+    margin-top: 2em;
+  }
+  #results_container {
+    position: fixed;
   }
 }
 
@@ -482,10 +522,10 @@ div.team-matchup {
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   @include flex_center;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
   pointer-events: none;
   background: linear-gradient(120deg, rgba(10, 19, 134, 0.7), rgba(119, 76, 22, 0.8) 90%);
   @include transition(opacity .45s);
@@ -508,7 +548,7 @@ div.team-matchup {
   }
   #sim_bar {
     width: 100%;
-    height: 12em;
+    min-height: 12em;
     border-radius: 2px 2px 0 0;
     // background-color: #000;
     background-color: #0C0C0C;

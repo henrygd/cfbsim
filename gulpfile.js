@@ -59,17 +59,25 @@ gulp.task('css', function(){
 
 // BUILD PRODUCTION
 gulp.task('copy_to_production', function() {
+  // postcss processors
+  var processors = [
+    autoprefixer({browsers: ['last 2 versions']}),
+    mqpacker,
+    csswring
+  ];
   // copy css files
   gulp.src('css/*.css')
     .pipe(concat('main.min.css'))
-    .pipe(uglifyCss())
-    .on('error', console.error.bind(console))
+    // minify / prefix
+    .pipe(postcss(processors))
     .pipe(gulp.dest('build/css/'));
   // copy js files
   gulp.src('js/*.js')
     .pipe(concat('scripts.min.js'))
     .pipe(uglifyJs())
     .on('error', console.error.bind(console))
+    .pipe(gulp.dest('build/js/'));
+  gulp.src('js/*/*.js')
     .pipe(gulp.dest('build/js/'));
   // copy HTML files / inject static files
   gulp.src('./*.html')

@@ -6,7 +6,7 @@ function globalOnLoad(cb){
   $('body').addClass('loading');
   function clear() {$('body').removeClass('loading');}
   // get team rankings
-  $.getScript('/js/teamRatings/teamratings.js')
+  $.getScript('js/teamRatings/teamratings.js')
     .fail(function() {
       clear();
       alert('Error: Could not fetch team rankings. Please try again later.');
@@ -24,7 +24,7 @@ function globalOnLoad(cb){
         // check if localstorage can be used
         if ( localStorage !== null ){
           // get logos
-          $.getScript('/js/teamLogoScript/teamLogos.js').done(function() {
+          $.getScript('js/teamLogoScript/teamLogos.js').done(function() {
             setTimeout(function() {
               clear();
               cb();
@@ -270,7 +270,7 @@ var cfbSim = {
     }
 
     // simStats.find('.score').text( (result.teamOne.totalPoints / numGames) + ' - ' + (result.teamTwo.totalPoints / numGames) );
-    simStats.find('.score').html('<span style="color:' + getColor(teamOneName) + '">' + (result.teamOne.totalPoints / numGames).toFixed(1) + '</span> - ' + '<span style="color:' + getColor(teamTwoName) + '">' + (result.teamTwo.totalPoints / numGames).toFixed(1) + '</span>' );
+    simStats.find('.score').html('<span style="color:' + getColor(teamOneName) + '">' + (result.teamOne.totalPoints / numGames).toFixed(1) + '</span> - ' + '<span style="color:' + getColor(teamTwoName) + '">' + Math.round(result.teamTwo.totalPoints / numGames) + '</span>' );
 
     // put team logo / color on bar display
     $('#team_one_bar, #team_two_bar').each(function(index){
