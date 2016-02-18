@@ -1,4 +1,4 @@
-// todo fix biggest strength ordering for second team
+// todo ...
 /* global ready function checks if logos are cached, fetches them if not,
    then passes to supplied page-specific onload function */
 function globalOnLoad(cb){
@@ -236,7 +236,7 @@ var cfbSim = {
         if (count < 500) {
           count += 10;
           el.text(count);
-          setTimeout(counter, 32);
+          setTimeout(counter, 33);
         }
       };
     })();
@@ -259,12 +259,14 @@ var cfbSim = {
     if (result.teamOne.wins === result.teamTwo.wins) {
       simStats.find('.winning-team').text('Too close to call').css('color', '#333');
       simStats.find('.wins').text('Even');
+      simStats.find('.winchance').text('50%');
     }
     else {
       var winner = (result.teamOne.wins > result.teamTwo.wins ? result.teamOne : result.teamTwo);
       $('#team_one_bar').css('flex-basis', (result.teamOne.wins / numGames * 100) + '%');
       simStats.find('.winning-team').text(winner.teamName).css('color', getColor(winner.teamName));
       simStats.find('.wins').text(winner.wins + '/' + numGames);
+      simStats.find('.winchance').text((winner.wins / numGames * 100).toFixed(1) + '%');
     }
 
     // simStats.find('.score').text( (result.teamOne.totalPoints / numGames) + ' - ' + (result.teamTwo.totalPoints / numGames) );
@@ -475,8 +477,8 @@ function Team( teamName ){
   this.totalPoints = 0;
 }
 Team.prototype.driveAgainst = function( opponent ){
-  var teamMagic = (this.qualityPPG * 8 + this.discipline) / (Math.random() * 12 + 10);
-  var oppMagic = (opponent.qualityPPG * 8 + opponent.discipline) / (Math.random() * 12 + 10);
+  var teamMagic = (this.qualityPPG * 7 + this.discipline) / (Math.random() * 12 + 10);
+  var oppMagic = (opponent.qualityPPG * 7 + opponent.discipline) / (Math.random() * 12 + 10);
   // console log the magic for debugging
   // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
 

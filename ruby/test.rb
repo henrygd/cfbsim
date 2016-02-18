@@ -215,7 +215,7 @@ sacks_allowed_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/s
 sacks_allowed_teams = sacks_allowed_page.css('.team-name > a')
 sack_yds_allowed = sacks_allowed_page.css('table.leaders td:nth-child(5)')
 sacks_allowed = sacks_allowed_page.css('table.leaders td:nth-child(4)')
-sacks_allowed_pg = sack_page.css('table.leaders td:nth-child(6)')
+sacks_allowed_pg = sacks_allowed_page.css('table.leaders td:nth-child(6)')
 # Add team sack yards to hash
 sacks_allowed_teams.each_with_index do |team, x| 
   # TEAM_HASH[team.text] ||= {}
@@ -257,7 +257,7 @@ Pass_offense_ypg = Pass_offense_page.css('table.leaders td:nth-child(13)')
 
 def calculate_pass_offense( arr )
   return ( Pass_offense_ypa[arr[0]].text.to_f * 2.0 ) -
-         ( TEAM_HASH[arr[1]::to_sym][:sacks_allowed_pg] ) +
+         ( TEAM_HASH[arr[1]::to_sym][:sacks_allowed_pg] * 2.0 ) +
          ( Pass_offense_comp_percent[arr[0]].text.to_f / 4.0 ) + 
          ( ( Pass_offense_tds[arr[0]].text.to_f - Pass_offense_ints[arr[0]].text.to_f) / 2.0 ) +
          ( Pass_offense_ypg[arr[0]].text.to_f / 30.0 )
@@ -302,7 +302,7 @@ Pass_defense_ypg = Pass_defense_page.css('table.leaders td:nth-child(13)')
 
 def calculate_pass_defense( arr )
   return ( Pass_defense_ypa[arr[0]].text.to_f * 2.0 ) -
-         ( TEAM_HASH[arr[1]::to_sym][:sacks_pg] ) +
+         ( TEAM_HASH[arr[1]::to_sym][:sacks_pg] * 2.0) +
          ( Pass_defense_comp_percent[arr[0]].text.to_f / 4.0 ) + 
          ( Pass_defense_tds[arr[0]].text.to_f - Pass_defense_ints[arr[0]].text.to_f ) +
          ( Pass_defense_ypg[arr[0]].text.to_f / 30.0 )
