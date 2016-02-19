@@ -17,7 +17,7 @@
   ],
   "author": "Hank Dollman",
   "license": "ISC",
-  "homepage": "https://henrygd.me/cfbsim",
+  "homepage": "http://henrygd.github.io/cfbsim",
   "devDependencies": {
     "autoprefixer": "^6.3.3",
     "css-mqpacker": "^4.0.0",

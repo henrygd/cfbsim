@@ -1,6 +1,6 @@
-// todo ...
-/* global ready function checks if logos are cached, fetches them if not,
-   then passes to supplied page-specific onload function */
+// global ready function grabs team ratings, checks if logos are cached and
+// fetches them if not, then runs supplied callback
+// (scalable for additional content like team pages, computer poll, etc.)
 function globalOnLoad(cb){
   // show loading icon
   $('body').addClass('loading');
@@ -90,10 +90,6 @@ var cfbSim = {
         default:
           break;
       }
-      // if (e.keyCode == 39)
-      //   var nextTeam = cfbSim.curTeams[0].nextAll('li').eq(0)
-      //   if (nextTeam.length > 0)
-      //     cfbSim.changeTeam(nextTeam, 0)
     });
 
     // logo image load binding to get logo color / change matchup text
@@ -117,10 +113,6 @@ var cfbSim = {
     // close game results popup
     $('#close_results_btn').on('click', function(){
       cfbSim.closeSim();
-    });
-
-    $(window).resize(function() {
-      cfbSim.dropDown.setHeight();
     });
 
     // initialize drop down team selection menu
@@ -149,11 +141,7 @@ var cfbSim = {
     var fullColor = 'rgb(' + teamColor + ')';
     var overallColor = 'rgba(' + cfbSim.getRatingColor(TeamRatings[team][0]) + ', .8)';
     overall.css('background-color', overallColor);
-    // $('.team-panel').eq(index).find('.logo-container').css('background-color', 'rgb(' + teamColor + 
-    //               ')');
     selectBox.css('background-color', 'rgb(' + teamColor + ')');
-    // selectBox.css('background', 'linear-gradient(rgba(' + teamColor + 
-    //               ', .9), rgb(' + teamColor + '))');
     teamText.css('background-color', fullColor)
             .text(team);
   },
@@ -174,9 +162,6 @@ var cfbSim = {
       var rating = teamRatings[index];
       var meterColor = cfbSim.getRatingColor(rating);
       $(meterText[index]).text(rating);
-      // $(meters[index - 1]).animate({
-      //   width: rating + '%',
-      // }, {duration: 700, queue: false}).css('background-color', meterColor);
       if (rating < 10 )
         rating = '0' + rating;
       $(meters[index -1]).css({'background-color': 'rgb(' + meterColor + ')',
@@ -212,8 +197,6 @@ var cfbSim = {
       colorString =  '0, 79, 156';
     // cache team colors in localStorage so we don't do this again
     localStorage['color_' + team] = colorString;
-    // this.teamColors[team] = this.teamColors[team] || {};
-    // this.teamColors[team] = colorString;
     return colorString;
   },
 
@@ -231,11 +214,11 @@ var cfbSim = {
     // function to display count of games being simulated
     var counter = (function() {
       var count = 0;
-      var el = $('#sim_bar').find('.counter');
+      var el = $('#sim_bar').find('.counter')[0];
       return function() {
         if (count < 500) {
           count += 10;
-          el.text(count);
+          el.innerHTML = count;
           setTimeout(counter, 33);
         }
       };
@@ -245,17 +228,12 @@ var cfbSim = {
     var teamTwoName = cfbSim.curTeams[1].text();
     var teamOne = new Team( teamOneName );
     var teamTwo = new Team( teamTwoName );
-    // var comparativeStrengths = compareStrengths(teamOne, teamTwo);
     var numGames = 500;
     var result = SimGame(teamOne, teamTwo, numGames);
     var simStats = $('#sim_stats');
     function getColor(team) {
       return 'rgb(' + localStorage['color_' + team] + ')';
     }
-    // $('#sim_winning_pct').text();
-    // var winner = simResult[0] > simResult[1] ? teamOneName : teamTwoName;
-    // var loser = result.teamOne.wins > result.teamto
-    // console.log(result.teamOne.wins + ', ' + result.teamTwo.wins);
     if (result.teamOne.wins === result.teamTwo.wins) {
       simStats.find('.winning-team').text('Too close to call').css('color', '#333');
       simStats.find('.wins').text('Even');
@@ -269,7 +247,7 @@ var cfbSim = {
       simStats.find('.winchance').text((winner.wins / numGames * 100).toFixed(1) + '%');
     }
 
-    // simStats.find('.score').text( (result.teamOne.totalPoints / numGames) + ' - ' + (result.teamTwo.totalPoints / numGames) );
+    // fill out results / stats
     simStats.find('.score').html('<span style="color:' + getColor(teamOneName) + '">' + (result.teamOne.totalPoints / numGames).toFixed(1) + '</span> - ' + '<span style="color:' + getColor(teamTwoName) + '">' + Math.round(result.teamTwo.totalPoints / numGames) + '</span>' );
 
     // put team logo / color on bar display
@@ -309,28 +287,15 @@ var cfbSim = {
       var teamOptions = $('.select-options');
       // store team menu elements
       cfbSim.teamNodelist = $('#team_one_options > li');
-      // set team select menu to match panel height
-      cfbSim.dropDown.setHeight(teamOptions);
-
       // initialize scrollbar
       Ps.initialize(teamOptions[0]);
       Ps.initialize(teamOptions[1]);
-
       // team dropropdown click binding
       teamOptions.find('> li').on('click', function(){
         var el = $(this);
         cfbSim.changeTeam( el, el.getPanelIndex() );
       });
     },
-
-    // set team select menu to match panel height
-    setHeight: function(teamOptions){
-      teamOptions = teamOptions || $('.select-options');
-      var selectBox = teamOptions.eq(0).parent();
-      var panel = selectBox.parent();
-      var height = panel.height() - selectBox.height() + 1;
-      teamOptions.css('height', height + 'px');
-    }
   }
 };
 
@@ -338,12 +303,6 @@ var cfbSim = {
 cfbSim.compareStrengths = (function() {
   var elOne = $('#compare_team_one');
   var elTwo = $('#compare_team_two');
-  // var textOne = elOne.find('h3');
-  // var textTwo = elTwo.find('h3');
-  // var logoOne = elOne.find('.comp-strength-logo');
-  // var logoTwo = elTwo.find('.comp-strength-logo');
-  // var meterOne = elOne.find('.meter');
-  // var meterTwo = elTwo.find('.meter');
   var elBundleOne = [elOne, elOne.find('h3'), elOne.find('.meter'), elOne.find('.comp-strength-logo')];
   var elBundleTwo = [elTwo, elTwo.find('h3'), elTwo.find('.meter'), elTwo.find('.comp-strength-logo')];
   var ratings = [
@@ -381,18 +340,16 @@ cfbSim.compareStrengths = (function() {
       num = '0' + num;
     els[2].css({'-webkit-transform': 'scale3d(.' + num + ', 1, 1)',
             'transform': 'scale3d(.' + num + ', 1, 1)'});
-
   }
   // return closure to use above vars / functions
   return function() {
     clearTimeout(window.TimeoutCompareStrengths);
-
+    // timout to prevent two calls on simultaneous switch of both teams
     window.TimeoutCompareStrengths = setTimeout(function() {
       var teamOneName = cfbSim.curTeams[0].text();
       var teamTwoName = cfbSim.curTeams[1].text();
       var teamOne = new Team(teamOneName);
       var teamTwo = new Team(teamTwoName);
-      // var teams = [teamOne, teamTwo];
       var compRats = [
         teamOne.runOff - teamTwo.runDef,
         teamOne.passOff - teamTwo.passDef,
@@ -411,12 +368,8 @@ cfbSim.compareStrengths = (function() {
           teamTwoStrength = [index, num];
       });
       // make changes on page
-      // if (i === 0) {
-        scale(1, teamOneStrength[1], teamOneName, teamOneStrength[0], teamTwoName);
-        scale(2, (teamTwoStrength[1] * -1), teamTwoName, teamTwoStrength[0], teamOneName);
-      // }
-
-
+      scale(1, teamOneStrength[1], teamOneName, teamOneStrength[0], teamTwoName);
+      scale(2, (teamTwoStrength[1] * -1), teamTwoName, teamTwoStrength[0], teamOneName);
     }, 50);
 
   };
@@ -426,8 +379,8 @@ cfbSim.compareStrengths = (function() {
 function SimGame( teamOne, teamTwo, gamesNum) {
   var teamOneScore;
   var teamTwoScore;
-  // default number of games is 400
-  gamesNum = gamesNum || 100;
+  // default number of games is 500
+  gamesNum = gamesNum || 500;
   // res
   teamOne.wins = 0;
   teamTwo.wins = 0;
@@ -442,12 +395,10 @@ function SimGame( teamOne, teamTwo, gamesNum) {
     }
     // OVERTIME
     if ( teamOneScore == teamTwoScore ) {
-      // console.log('overtime at ' + teamOneScore + '-' + teamTwoScore);
       while (teamOneScore == teamTwoScore) {
         teamOneScore += teamOne.driveAgainst( teamTwo );
         teamTwoScore += teamTwo.driveAgainst( teamOne );
       }
-      // console.log('overtime done at ' + teamOneScore + '-' + teamTwoScore);
     }
     // add to respective team's win number
     teamOne.totalPoints += teamOneScore;
