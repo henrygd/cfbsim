@@ -1,5 +1,5 @@
-// global ready function grabs team ratings, checks if logos are cached and
-// fetches them if not, then runs supplied callback
+// global ready function grabs team ratings, checks if logos are cached,
+// fetches & stores them if not, then runs supplied callback
 // (scalable for additional content like team pages, computer poll, etc.)
 function globalOnLoad(cb){
   // show loading icon
@@ -115,12 +115,44 @@ var cfbSim = {
       cfbSim.closeSim();
     });
 
+    // set popstate to load url teams
+    window.addEventListener('popstate', function(event) {
+      // console.log('popstate fired!');
+      cfbSim.loadURLTeams();
+    });
+
     // initialize drop down team selection menu
     cfbSim.dropDown.initialize();
-    // random teams on page load
-    cfbSim.randomTeam([0, 1]);
+    // find teams or assign random teams on page load
+    if (window.location.hash.length > 0)
+      cfbSim.loadURLTeams();
+    else
+      cfbSim.randomTeam([0, 1]);
     // fade in elements on page load
     $('body').removeClass('hide-elements');
+  },
+
+  // load teams if specified in url 
+  loadURLTeams: function() {
+    var teams = window.location.hash.replace('#', '').split('_vs_');
+    var teamOne = decodeURI(teams[0]);
+    var teamTwo = decodeURI(teams[1]);
+    var teamList = Object.keys(TeamRatings);
+    var teamCount = 0;
+    teamList.forEach(function(thisTeam, index) {
+      if (thisTeam === teamOne) {
+        cfbSim.changeTeam($(cfbSim.teamNodelist[index]), 0);
+        teamCount += 1;
+      }
+      else if (thisTeam === teamTwo) {
+        cfbSim.changeTeam($(cfbSim.teamNodelist[index]), 1);
+        teamCount += 1;
+      }
+    });
+    if (teamCount < 2)
+      cfbSim.randomTeam([0, 1]);
+    else
+      document.title = ('CFB SIM | ' + teamOne + ' vs ' + teamTwo);
   },
 
   // set random teams on page load
@@ -211,6 +243,8 @@ var cfbSim = {
   },
 
   startSim: function(){
+    // clear close timeout
+    clearTimeout(cfbSim.closeTimeout);
     // function to display count of games being simulated
     var counter = (function() {
       var count = 0;
@@ -276,7 +310,7 @@ var cfbSim = {
     clearTimeout(ShowStats);
     // $(this).slideUp();
     $('#sim_stats').css({'max-height': '0'});
-    setTimeout(function(){
+    cfbSim.closeTimeout = setTimeout(function(){
       $('#sim_bar').find('.sim-text').css('opacity', '1');
       $('#team_one_bar').css('flex-basis', '50%');
     }, 455);
@@ -360,6 +394,8 @@ cfbSim.compareStrengths = (function() {
       ];
       var teamOneStrength = [0, 0];
       var teamTwoStrength = [0, 0];
+      // set window location to match teams
+      window.location.hash = encodeURI(teamOneName + '_vs_' + teamTwoName);
       // loop through comparative ratings to find largest in favor
       compRats.forEach(function(num, index) {
         if (num > teamOneStrength[1])
@@ -428,8 +464,8 @@ function Team( teamName ){
   this.totalPoints = 0;
 }
 Team.prototype.driveAgainst = function( opponent ){
-  var teamMagic = (this.qualityPPG * 7 + this.discipline) / (Math.random() * 12 + 10);
-  var oppMagic = (opponent.qualityPPG * 7 + opponent.discipline) / (Math.random() * 12 + 10);
+  var teamMagic = (this.qualityPPG * 7 + this.discipline) / (Math.floor((Math.random() * 20) + 2));
+  var oppMagic = (opponent.qualityPPG * 7 + opponent.discipline) / (Math.floor((Math.random() * 20) + 2));
   // console log the magic for debugging
   // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
 
@@ -438,9 +474,9 @@ Team.prototype.driveAgainst = function( opponent ){
   var rand23 = teamRand * 2 + 1;
   var rand26 = teamRand * 3 + 5;
 
-  if ( (this.runOff / rand23) + teamMagic > oppRand * (opponent.runDef * 2.4) + oppMagic )
+  if ( ((this.runOff / rand23) + teamMagic) > (oppRand * (opponent.runDef * 3) + oppMagic) )
     return 7;
-  else if ( (this.passOff / rand23) + teamMagic > oppRand * (opponent.passDef * 2.4) + oppMagic )
+  else if ( ((this.passOff / rand23) + teamMagic) > (oppRand * (opponent.passDef * 3) + oppMagic) )
     return 7;
   else if ( (this.spTeams + teamMagic) / rand26 > oppRand * (opponent.spTeams + oppMagic) )
     return 3;
