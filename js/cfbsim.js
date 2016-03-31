@@ -115,12 +115,6 @@ var cfbSim = {
       cfbSim.closeSim();
     });
 
-    // set popstate to load url teams
-    window.addEventListener('popstate', function(event) {
-      // console.log('popstate fired!');
-      cfbSim.loadURLTeams();
-    });
-
     // initialize drop down team selection menu
     cfbSim.dropDown.initialize();
     // find teams or assign random teams on page load
@@ -134,25 +128,21 @@ var cfbSim = {
 
   // load teams if specified in url 
   loadURLTeams: function() {
-    var teams = window.location.hash.replace('#', '').split('_vs_');
-    var teamOne = decodeURI(teams[0]);
-    var teamTwo = decodeURI(teams[1]);
-    var teamList = Object.keys(TeamRatings);
-    var teamCount = 0;
-    teamList.forEach(function(thisTeam, index) {
-      if (thisTeam === teamOne) {
-        cfbSim.changeTeam($(cfbSim.teamNodelist[index]), 0);
-        teamCount += 1;
-      }
-      else if (thisTeam === teamTwo) {
-        cfbSim.changeTeam($(cfbSim.teamNodelist[index]), 1);
-        teamCount += 1;
-      }
+    var urlTeams = window.location.hash.replace('#', '').split('_vs_');
+    var teamOne = decodeURI(urlTeams[0]);
+    var teamTwo = decodeURI(urlTeams[1]);
+    var allTeams = Object.keys(TeamRatings);
+    var simTeams = [];
+    allTeams.forEach(function(thisTeam, index) {
+      if (thisTeam === teamOne || thisTeam === teamTwo)
+        simTeams.push($(cfbSim.teamNodelist[index]));
     });
-    if (teamCount < 2)
+    if (simTeams.length < 2)
       cfbSim.randomTeam([0, 1]);
-    else
-      document.title = ('CFB SIM | ' + teamOne + ' vs ' + teamTwo);
+    else {
+      cfbSim.changeTeam(simTeams[0], 0);
+      cfbSim.changeTeam(simTeams[1], 1);
+    }
   },
 
   // set random teams on page load
@@ -253,7 +243,7 @@ var cfbSim = {
         if (count < 500) {
           count += 10;
           el.innerHTML = count;
-          setTimeout(counter, 33);
+          setTimeout(counter, 35);
         }
       };
     })();
@@ -299,9 +289,15 @@ var cfbSim = {
     counter();
     // drop down results / stats
     ShowStats = setTimeout(function(){
-      var ddheight = simStats[0].scrollHeight;
-      $('#sim_bar').find('.sim-text').css('opacity', '0');
-      $('#sim_stats').css({'max-height': ddheight});
+      var statsHeight = simStats[0].scrollHeight;
+      var simBar = $('#sim_bar');
+      if (statsHeight + simBar.height() + $('#close_results_btn').height() > $(window).height()) {
+        $(simStats).css({'max-height': 'calc(100vh - 16em', 'overflow': 'auto'});
+      }
+      else {
+        $(simStats).css('max-height', statsHeight + 'px');
+      }
+      simBar.find('.sim-text').css('opacity', '0');
     }, 2500);
   },
 
@@ -395,7 +391,7 @@ cfbSim.compareStrengths = (function() {
       var teamOneStrength = [0, 0];
       var teamTwoStrength = [0, 0];
       // set window location to match teams
-      window.location.hash = encodeURI(teamOneName + '_vs_' + teamTwoName);
+      history.replaceState({}, '', '#' + encodeURI(teamOneName + '_vs_' + teamTwoName));
       // loop through comparative ratings to find largest in favor
       compRats.forEach(function(num, index) {
         if (num > teamOneStrength[1])
@@ -468,12 +464,10 @@ Team.prototype.driveAgainst = function( opponent ){
   var oppMagic = (opponent.qualityPPG * 7 + opponent.discipline) / (Math.floor((Math.random() * 20) + 2));
   // console log the magic for debugging
   // console.log(this.teamName + ' magic: ' + teamMagic + ', ' + opponent.teamName + ' magic: ' + oppMagic);
-
   var teamRand = Math.random();
   var oppRand  = Math.random();
   var rand23 = teamRand * 2 + 1;
   var rand26 = teamRand * 3 + 5;
-
   if ( ((this.runOff / rand23) + teamMagic) > (oppRand * (opponent.runDef * 3) + oppMagic) )
     return 7;
   else if ( ((this.passOff / rand23) + teamMagic) > (oppRand * (opponent.passDef * 3) + oppMagic) )

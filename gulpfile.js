@@ -1,3 +1,4 @@
+// Custom gulpfile for basic onepage web development
 var gulp = require('gulp'),
     uglifyJs = require('gulp-uglify'),
     rename = require('gulp-rename'),
@@ -6,7 +7,6 @@ var gulp = require('gulp'),
     ghPages = require('gulp-gh-pages'),
     concat = require('gulp-concat'),
     inject = require('gulp-inject'),
-    runSequence = require('run-sequence'),
     postcss = require('gulp-postcss'),
     autoprefixer = require('autoprefixer'),
     mqpacker = require('css-mqpacker'),
@@ -22,7 +22,7 @@ gulp.task('deploy', function() {
 });
 
 // INJECT STATIC FILE LINKS INTO HTML (DEV)
-gulp.task('index', function () {
+gulp.task('inject', function () {
   var target = gulp.src('./index.html');
   var sources = gulp.src(['js/*.js', 'css/**/*.css'], {read: false});
   return target.pipe(inject(sources))
@@ -57,40 +57,44 @@ gulp.task('css', function(){
     .pipe(gulp.dest('css/'));
 });
 
-// BUILD PRODUCTION
-gulp.task('copy_to_production', function() {
-  // postcss processors
+
+//////// BUILD PRODUCTION ////////
+// COPY HTML
+gulp.task('copy_html_to_production', function() {
+  return gulp.src('./*.html')
+    .pipe(gulp.dest('./build'));
+})
+// CONCAT / MINIFY / COPY CSS
+gulp.task('copy_css_to_production', ['copy_html_to_production'], function() {
   var processors = [
     autoprefixer({browsers: ['last 2 versions']}),
     mqpacker,
     csswring
   ];
-  // copy css files
-  gulp.src('css/*.css')
+  return gulp.src('css/*.css')
     .pipe(concat('main.min.css'))
     // minify / prefix
     .pipe(postcss(processors))
     .pipe(gulp.dest('build/css/'));
-  // copy js files
-  gulp.src('js/*.js')
+})
+// CONCAT / MINIFY / COPY JAVASCRIPT
+gulp.task('copy_js_to_production', ['copy_css_to_production'], function() {
+  gulp.src('js/*/*.js')
+    .pipe(gulp.dest('build/js/'));
+  return gulp.src('js/*.js')
     .pipe(concat('scripts.min.js'))
     .pipe(uglifyJs())
     .on('error', console.error.bind(console))
     .pipe(gulp.dest('build/js/'));
-  gulp.src('js/*/*.js')
-    .pipe(gulp.dest('build/js/'));
-  // copy HTML files / inject static files
-  gulp.src('./*.html')
-  .pipe(gulp.dest('./build'));
-});
-// inject
-gulp.task('inject_production', function() {
-  gulp.src('./build/*.html')
+})
+// INJECT SCRIPTS INTO HTML
+gulp.task('inject_production', ['copy_js_to_production'], function() {
+  return gulp.src('./build/*.html')
     .pipe(inject(gulp.src(['./build/js/*.js', './build/css/*.css'],{read: false}), {relative: true}))
     .pipe(gulp.dest('./build'));
 });
-// copy images
-gulp.task('copy_img_to_production', function() {
+// COPY IMAGES
+gulp.task('copy_img_to_production', ['inject_production'], function() {
   gulp.src('img/*')
     .pipe(gulp.dest('build/img/'));
 });
@@ -112,16 +116,15 @@ gulp.task('serve', function(){
 gulp.task('serve_production', function(){
   var server = gls.static('./build', 8080);
   server.start();
-  // run css / js tasks
-  // gulp.watch(sassFiles, ['css']);
-  // gulp.watch(jsFiles, ['uglifyjs']);
-  // // reloads the server
-  // gulp.watch(['build/js/*.js', 'build/css/*.css', './index.html'], function (file) {
-  //   server.notify.apply(server, [file]);
-  // });
 });
 
-gulp.task('test_production', function() {
-  runSequence(['copy_to_production', 'inject_production', 'serve_production']);
-});
 gulp.task('default', ['serve']);
+gulp.task('build_production', 
+  [
+    'copy_html_to_production', 
+    'copy_css_to_production', 
+    'copy_js_to_production', 
+    'inject_production',
+    'copy_img_to_production'
+  ]
+);

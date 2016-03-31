@@ -28,9 +28,15 @@ body {
   // max-width: 100vw;
 }
 
+@media all and (min-width: 1500px) {
+  body {
+    font-size: 18px;
+  }
+}
+
 @media all and (min-width: 1800px) {
   body {
-    font-size: 1.2em;
+    font-size: 22px;
   }
 }
 
@@ -292,6 +298,7 @@ select {
   .overall {
     background-color: #767676;
     color: #F9F9F9;
+    padding: .2em;
     text-align: center;
     text-transform: uppercase;
     // text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.18);
@@ -464,6 +471,7 @@ div.team-matchup {
   h4 {
     position: absolute;
     background-color: #9E8350;
+    border: 1px solid #DCC9B0;
     color: #fff;
     bottom: 100%;
     left: 0;
@@ -574,13 +582,14 @@ div.team-matchup {
       right: 0;
       @include flex_center;
       color: #FFFFFF;
-      font-size: 3.3em;
+      font-size: 3.4em;
+      line-height: 1;
       width: 100%;
       // background-color: rgba(0, 0, 0, 0.35);
       font-weight: 700;
       text-align: center;
       text-transform: uppercase;
-      text-shadow: 1px 2px 6px #000;
+      text-shadow: 1px 2px .3em #000;
       @include transition(opacity .6s);
       div {
         z-index: 2;
