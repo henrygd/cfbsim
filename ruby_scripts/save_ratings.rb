@@ -445,4 +445,5 @@ end
 js += "}"
 open("../js/teamRatings/teamratings-#{Time.new.strftime("%Y-%m-%d")}.js", 'w') { |f|  f << js }
 open("../js/teamRatings/teamratings.js", 'w') { |f|  f << js }
+open("../build/js/teamRatings/teamratings.js", 'w') { |f|  f << js }
 puts "Updated team ratings"
