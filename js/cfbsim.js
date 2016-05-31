@@ -199,7 +199,7 @@ window.cfbSim = {
   },
 
   getRatingColor: function(rating){
-      if (rating < 45)
+      if (rating < 50)
         return '229, 57, 53';
       else if (rating < 75)
         return '243, 182, 0';

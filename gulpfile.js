@@ -1,4 +1,3 @@
-// Custom gulpfile for basic onepage web development
 var gulp = require('gulp'),
     uglifyJs = require('gulp-uglify'),
     rename = require('gulp-rename'),
