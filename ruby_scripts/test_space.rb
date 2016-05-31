@@ -1,4 +1,5 @@
-#! /bin/ruby
+# Just a place to test things - please ignore everything below
+
 # record = "8-0"
 
 # if record.split('-')[1] == '0'
@@ -66,7 +67,7 @@ TEAM_HASH = Team_hash["Air Force": {url: 721}, "Akron": {url: 5}, "Alabama": {ur
 
 # ############## INDIVIDUAL TEAMS ##############
 TEAM_HASH.each do |k, v|
-  team_page = Nokogiri::HTML( open( "/home/hank/Documents/team_pages/team_#{v[:url]}.html" ) )
+  team_page = Nokogiri::HTML( open( "./team_pages/team_#{v[:url]}.html" ) )
   # team_scoring = team_page.css('table.team-statistics tr')[1].css('td')
   # team_point_margin = team_scoring[1].text.to_f / team_scoring[2].text.to_f
   game_opponent = team_page.css('table.team-schedule td.opponent')

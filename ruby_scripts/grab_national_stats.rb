@@ -1,3 +1,6 @@
+#! /home/hank/.rbenv/shims/ruby
+
+# save national stats pages from cfbstats.com / footballoutsiders
 require 'open-uri'
 
 national_stats = {
@@ -14,9 +17,9 @@ national_stats = {
 
 national_stats.each do |k, v|
   web_page = open(v)
-  open("#{k}.html", 'w') do |f|
+  open("./national_stats/#{k}.html", 'w') do |f|
     f << web_page.read
   end
   puts "Saved #{k} page succesfully!"
-  sleep rand(1..2)
+  sleep 2
 end

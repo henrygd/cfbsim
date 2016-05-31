@@ -3,8 +3,12 @@
 // (scalable for additional content like team pages, computer poll, etc.)
 function globalOnLoad(cb){
   // show loading icon
-  $('body').addClass('loading');
-  function clear() {$('body').removeClass('loading');}
+  var $body = $('body');
+  var localStorageAvailable = localStorage !== null;
+  $body.addClass('loading');
+  function clear() {
+    $body.removeClass('loading');
+  }
   // get team rankings
   $.getScript('js/teamRatings/teamratings.js')
     .fail(function() {
@@ -13,7 +17,7 @@ function globalOnLoad(cb){
     })
     .done(function() {
       // check if team logos are pre-cached in localStorage
-      if ( localStorage !== null && localStorage.logo_Michigan ){
+      if ( localStorageAvailable && localStorage.logo_Michigan ){
         // go on with loading the page
         setTimeout(function() {
           clear();
@@ -22,7 +26,7 @@ function globalOnLoad(cb){
       }
       else {
         // check if localstorage can be used
-        if ( localStorage !== null ){
+        if ( localStorageAvailable ){
           // get logos
           $.getScript('js/teamLogoScript/teamLogos.js').done(function() {
             setTimeout(function() {
@@ -40,7 +44,7 @@ function globalOnLoad(cb){
     });
 }
 
-var cfbSim = {
+window.cfbSim = {
   // holds active teams
   curTeams: [],
   onLoad: function(){

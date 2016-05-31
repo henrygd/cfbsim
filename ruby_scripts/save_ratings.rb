@@ -1,4 +1,7 @@
-#! /usr/bin/ruby
+#! /home/hank/.rbenv/shims/ruby
+# calculate team rankings in somewhat roundabout way
+# must save updated teams / national stats pages first
+
 require 'nokogiri'
 require 'open-uri'
 
@@ -197,7 +200,7 @@ def correct_team_name( team )
 end
 
 ############## SACKS ##############
-sack_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/sacks.html" ) )
+sack_page = Nokogiri::HTML( open( "./national_stats/sacks.html" ) )
 sack_teams = sack_page.css('.team-name > a')
 sacks = sack_page.css('table.leaders td:nth-child(4)')
 sack_yds = sack_page.css('table.leaders td:nth-child(5)')
@@ -211,7 +214,7 @@ sack_teams.each_with_index do |team, x|
 end
 
 ############## SACKS ALLOWED ##############
-sacks_allowed_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/sacks_allowed.html" ) )
+sacks_allowed_page = Nokogiri::HTML( open( "./national_stats/sacks_allowed.html" ) )
 sacks_allowed_teams = sacks_allowed_page.css('.team-name > a')
 sack_yds_allowed = sacks_allowed_page.css('table.leaders td:nth-child(5)')
 sacks_allowed = sacks_allowed_page.css('table.leaders td:nth-child(4)')
@@ -225,7 +228,7 @@ sacks_allowed_teams.each_with_index do |team, x|
 end
 
 # ############## RUN OFFENSE ##############
-Run_offense_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/run_offense.html" ) )
+Run_offense_page = Nokogiri::HTML( open( "./national_stats/run_offense.html" ) )
 Run_offense_teams = Run_offense_page.css('.team-name > a')
 Run_offense_yards = Run_offense_page.css('table.leaders td:nth-child(5)')
 Run_offense_atts = Run_offense_page.css('table.leaders td:nth-child(4)')
@@ -245,7 +248,7 @@ Run_offense_teams.each_with_index do |team, x|
 end
 
 # # ############## PASS OFFENSE ##############
-Pass_offense_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/pass_offense.html" ) )
+Pass_offense_page = Nokogiri::HTML( open( "./national_stats/pass_offense.html" ) )
 Pass_offense_teams = Pass_offense_page.css('.team-name > a')
 Pass_offense_ypa = Pass_offense_page.css('table.leaders td:nth-child(8)')
 Pass_offense_comp_percent = Pass_offense_page.css('table.leaders td:nth-child(6)')
@@ -271,7 +274,7 @@ Pass_offense_teams.each_with_index do |team, x|
 end
 
 # ############## RUN DEFENSE ##############
-Run_defense_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/run_defense.html" ) )
+Run_defense_page = Nokogiri::HTML( open( "./national_stats/run_defense.html" ) )
 Run_defense_teams = Run_defense_page.css('.team-name > a')
 Run_defense_yards = Run_defense_page.css('table.leaders td:nth-child(5)')
 Run_defense_atts = Run_defense_page.css('table.leaders td:nth-child(4)')
@@ -290,7 +293,7 @@ Run_defense_teams.each_with_index do |team, x|
 end
 
 # ############## PASS DEFENSE ##############
-Pass_defense_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/pass_defense.html" ) )
+Pass_defense_page = Nokogiri::HTML( open( "./national_stats/pass_defense.html" ) )
 Pass_defense_teams = Pass_defense_page.css('.team-name > a')
 Pass_defense_ypa = Pass_defense_page.css('table.leaders td:nth-child(8)')
 Pass_defense_comp_percent = Pass_defense_page.css('table.leaders td:nth-child(6)')
@@ -316,12 +319,12 @@ Pass_defense_teams.each_with_index do |team, x|
 end
 
 # ############## lundgren ##############
-Penalties_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/penalties.html" ) )
+Penalties_page = Nokogiri::HTML( open( "./national_stats/penalties.html" ) )
 Penalties_teams = Penalties_page.css('.team-name > a')
 Penalties_per_game = Penalties_page.css('table.leaders td:nth-child(6)')
 
 
-Turnovers_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/turnovers.html" ) )
+Turnovers_page = Nokogiri::HTML( open( "./national_stats/turnovers.html" ) )
 Turnovers_teams = Turnovers_page.css('.team-name > a')
 Turnover_margin = Turnovers_page.css('table.leaders td:nth-child(11)')
 Top_turnover_margin = Turnover_margin[0].text.to_f
@@ -343,7 +346,7 @@ Turnovers_teams.each_with_index do |team, x|
 end
 
 ############## SPECIAL TEAMS ##############
-Special_teams_page = Nokogiri::HTML( open( "#{ENV['HOME']}/Documents/cfb_pages/special_teams.html" ) )
+Special_teams_page = Nokogiri::HTML( open( "./national_stats/special_teams.html" ) )
 st_teams = Special_teams_page.css('table.stats tr td:nth-child(2)')
 st_rating = Special_teams_page.css('table.stats tr td:nth-child(4)')
 # Add special teams rating
@@ -368,7 +371,7 @@ end
 
 # ############## INDIVIDUAL TEAMS ##############
 TEAM_HASH.each do |k, v|
-  team_page = Nokogiri::HTML( open( "/home/hank/Documents/cfb_pages/team_pages/team_#{v[:url]}.html" ) )
+  team_page = Nokogiri::HTML( open( "./team_pages/team_#{v[:url]}.html" ) )
   # team_scoring = team_page.css('table.team-statistics tr')[1].css('td')
   # team_point_margin = team_scoring[1].text.to_f / team_scoring[2].text.to_f
   game_opponent = team_page.css('table.team-schedule td.opponent')
@@ -432,12 +435,14 @@ TEAM_HASH.overall_to_hundred_scale!
 
 
 # # Output js teams
-start_js = "TeamRatings = {"
+js = "TeamRatings={"
 TEAM_HASH.each do |k, v|
   # unminified
-  # start_js += "\n  '#{k}': [#{v[:overall]}, #{v[:run_offense]}, #{v[:pass_offense]}, #{v[:run_defense]}, #{v[:pass_defense]}, #{v[:special_teams]}, #{v[:lundgren]}, #{v[:sos]}, #{v[:quality_ppg]}],"
+  # js += "\n  '#{k}': [#{v[:overall]}, #{v[:run_offense]}, #{v[:pass_offense]}, #{v[:run_defense]}, #{v[:pass_defense]}, #{v[:special_teams]}, #{v[:lundgren]}, #{v[:sos]}, #{v[:quality_ppg]}],"
   # minified
-  start_js += "\"#{k}\":[#{v[:overall]},#{v[:run_offense]},#{v[:pass_offense]},#{v[:run_defense]},#{v[:pass_defense]},#{v[:special_teams]},#{v[:lundgren]},#{v[:sos]},#{v[:quality_ppg]}],"
+  js += "\"#{k}\":[#{v[:overall]},#{v[:run_offense]},#{v[:pass_offense]},#{v[:run_defense]},#{v[:pass_defense]},#{v[:special_teams]},#{v[:lundgren]},#{v[:sos]},#{v[:quality_ppg]}],"
 end
-
-puts start_js + "};"
+js += "}"
+open("../js/teamRatings/teamratings-#{Time.new.strftime("%Y-%m-%d")}.js", 'w') { |f|  f << js }
+open("../js/teamRatings/teamratings.js", 'w') { |f|  f << js }
+puts "Updated team ratings"
