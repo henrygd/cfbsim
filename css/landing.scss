@@ -57,10 +57,10 @@ body {
       position: relative!important;
       max-width: 96%;
       width: 100%;
-      left: initial;
-      right: initial!important;
-      top: initial;
-      bottom: initial;
+      left: auto;
+      right: auto!important;
+      top: auto;
+      bottom: auto;
     }
   }
   .btn-sim {
@@ -317,7 +317,7 @@ select {
 }
 
 #team_two_panel {
-  left: initial;
+  left: auto;
   right: 2vh;
   // .logo-container {
   //     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, 0.1) 35px, rgba(255, 255, 255, 0.1) 70px);
@@ -441,7 +441,7 @@ div.team-matchup {
     transition: .2s;
   }
   &::after {
-    left: initial;
+    left: auto;
     right: 0;
     transform: none;
   }
@@ -570,7 +570,7 @@ div.team-matchup {
   }
   #sim_bar {
     width: 100%;
-    min-height: 12em;
+    height: 12em;
     border-radius: 2px 2px 0 0;
     // background-color: #000;
     background-color: #0C0C0C;
