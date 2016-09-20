@@ -212,6 +212,14 @@ sack_teams.each_with_index do |team, x|
   TEAM_HASH[team.text::to_sym][:sack_yds] = sack_yds[x].text.to_f
   TEAM_HASH[team.text::to_sym][:sacks_pg] = sacks_pg[x].text.to_f
 end
+# if team has no sacks, add 0 (thanks notre dame 2016 for revealing this bug)
+TEAM_HASH.each do |k, v|
+  if !v[:sacks]
+    v[:sacks] = 0
+    v[:sack_yds] = 0
+    v[:sacks_pg] = 0
+  end
+end
 
 ############## SACKS ALLOWED ##############
 sacks_allowed_page = Nokogiri::HTML( open( "./national_stats/sacks_allowed.html" ) )
@@ -345,23 +353,6 @@ Turnovers_teams.each_with_index do |team, x|
     Turnover_margin[x].text.to_f, TEAM_HASH[team][:penalties] )
 end
 
-############## SPECIAL TEAMS ##############
-Special_teams_page = Nokogiri::HTML( open( "./national_stats/special_teams.html" ) )
-st_teams = Special_teams_page.css('table.stats tr td:nth-child(2)')
-st_rating = Special_teams_page.css('table.stats tr td:nth-child(4)')
-# Add special teams rating
-st_worst = st_rating.last.text.to_f * 2.5
-st_best = ( st_rating[1].text.to_f - st_worst ) * 1.01
-st_teams.each_with_index do |team, x|
-  team = team.text
-  next if team == 'Team'
-  # Adjust team names to match other site
-  team = correct_team_name( team )
-  # TEAM_HASH[team] ||= {}
-  TEAM_HASH[team::to_sym][:special_teams] = ( ( (st_rating[x].text.to_f - st_worst) / 
-    st_best ) * 100 ).round 0
-end
-
 
 # Output team  objects
 # TEAM_HASH.each do |k, v|
@@ -377,6 +368,7 @@ TEAM_HASH.each do |k, v|
   game_opponent = team_page.css('table.team-schedule td.opponent')
   game_date = team_page.css('table.team-schedule td.date')
   game_result = team_page.css('table.team-schedule td.result')
+  v[:team_page] = team_page
 
   game_opponent.each_with_index do |team, x|
     tt = team.text
@@ -419,6 +411,61 @@ TEAM_HASH.each do |k, v|
   # v[:games] = [team_scoring.text]
   # p "#{k} ppg bonus: #{team_point_margin}"
 end
+
+############## SPECIAL TEAMS ##############
+
+TEAM_HASH.each do |k, v|
+  team_page = v[:team_page]
+  # field goals
+  fg_pct = team_page.css(':nth-child(30) :nth-child(2)').text.gsub('%', '').to_f
+  fg_makes = team_page.css(':nth-child(31) :nth-child(2)').text.gsub(/\d* - /, '').to_f
+  fg_overall = 10 + (fg_pct / 10) + (fg_makes / 2)
+  # punting
+  punt_dist = team_page.css(':nth-child(18) :nth-child(2)').text.to_f
+  punt_overall = punt_dist - 40
+  net_punt_return = team_page.css(':nth-child(14) :nth-child(2)').text.to_f -
+                   team_page.css(':nth-child(14) :nth-child(3)').text.to_f
+  punt_return_overall = net_punt_return / 3
+  # kicking
+  net_kick_return = team_page.css(':nth-child(16) :nth-child(2)').text.to_f -
+                   team_page.css(':nth-child(16) :nth-child(3)').text.to_f
+  kick_return_overall = net_kick_return / 3
+  # overall
+  st_overall = ((fg_overall + punt_overall + punt_return_overall + kick_return_overall) + 20) / 2
+  v[:special_teams] = st_overall
+
+  # debug
+  # p "#{k}: #{((fg_overall + punt_overall + punt_return_overall + kick_return_overall) + 20) / 2} || fg: #{fg_overall}, punt_dist: #{punt_overall}, punt_return: #{punt_return_overall}, kickret: #{kick_return_overall}"
+end
+# blocked kick bonus
+Blocked_kick_page = Nokogiri::HTML( open( "./national_stats/blocked_kicks.html" ) )
+blocked_kick_teams = Blocked_kick_page.css('.team-name > a')
+blocked_kicks_pg = Blocked_kick_page.css('td:nth-child(5)')
+blocked_kick_teams.each_with_index do |team, x|
+  bonus = blocked_kicks_pg[x].text.to_f * 5
+  # p "#{team.text} bonus: #{bonus}"
+  TEAM_HASH[team.text::to_sym][:special_teams] += bonus
+end
+
+# old fei special teams code
+# Special_teams_page = Nokogiri::HTML( open( "./national_stats/special_teams.html" ) )
+# st_teams = Special_teams_page.css('table.stats tr td:nth-child(2)')
+# st_rating = Special_teams_page.css('table.stats tr td:nth-child(4)')
+# # Add special teams rating
+# st_worst = st_rating.last.text.to_f * 2.5
+# st_best = ( st_rating[1].text.to_f - st_worst ) * 1.01
+# st_teams.each_with_index do |team, x|
+#   team = team.text
+#   next if team == 'Team'
+#   # Adjust team names to match other site
+#   team = correct_team_name( team )
+#   # TEAM_HASH[team] ||= {}
+#   TEAM_HASH[team::to_sym][:special_teams] = ( ( (st_rating[x].text.to_f - st_worst) / 
+#     st_best ) * 100 ).round 0
+# end
+
+
+
 adjust_lundgren!
 TEAM_HASH
   .stats_to_hundred_scale! # .overall_to_hundred_scale!

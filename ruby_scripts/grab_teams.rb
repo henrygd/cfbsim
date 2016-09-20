@@ -7,8 +7,8 @@ teams = {:Cincinnati=>{:img=>"2132", :url=>140}, :Connecticut=>{:img=>"41", :url
 
 teams.each do |k, v|
   team_num = v[:url]
-  web_page = open("http://www.cfbstats.com/2015/team/140/index.html")
-  open("team_#{team_num}.html", 'w') do |f|
+  web_page = open("http://www.cfbstats.com/2016/team/#{team_num}/index.html")
+  open("./team_pages/team_#{team_num}.html", 'w') do |f|
     f << web_page.read
   end
   puts "Saved #{k} page succesfully!"
