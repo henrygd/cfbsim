@@ -1,3 +1,5 @@
+#This repository is for the old 2015 version. Please see [the 2016 update here.](https://github.com/henrygd/cfbsim-react)
+
 ####CFB SIM
 
 View video-game-like ratings and simulate matchups between any two college football teams based on season stats.
